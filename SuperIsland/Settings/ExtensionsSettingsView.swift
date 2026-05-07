@@ -1,9 +1,6 @@
 import SwiftUI
 import AppKit
 
-private let linearMentionsExtensionID = "superisland.linear-mentions"
-private let lastFmScrobblerExtensionID = "superisland.lastfm-scrobbler"
-
 private enum ExtensionListFilter: String, CaseIterable, Identifiable {
     case all
     case active
@@ -12,8 +9,8 @@ private enum ExtensionListFilter: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .all: return "All"
-        case .active: return "Active"
+        case .all: return L("All")
+        case .active: return L("Active")
         }
     }
 }
@@ -55,7 +52,7 @@ struct ExtensionsSettingsView: View {
 
     private var filterBar: some View {
         HStack(spacing: 10) {
-            Text("Filter")
+            Text(L("Filter"))
                 .font(.system(size: 13, weight: .semibold))
 
             Picker("", selection: $listFilter) {
@@ -69,7 +66,7 @@ struct ExtensionsSettingsView: View {
 
             Spacer(minLength: 0)
 
-            Text("\(filteredManifests.count) shown")
+            Text(L("%d shown", filteredManifests.count))
                 .font(.caption)
                 .foregroundColor(.secondary)
 
@@ -89,7 +86,7 @@ struct ExtensionsSettingsView: View {
 
     private var leftPane: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Extensions")
+            Text(L("Extensions"))
                 .font(.headline.weight(.semibold))
 
             ScrollView {
@@ -118,31 +115,12 @@ struct ExtensionsSettingsView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     extensionHeaderCard(for: manifest)
 
-                    if manifest.id == "superisland.whatsapp-web" {
-                        SettingsCard(title: "WhatsApp Web Login") {
-                            WhatsAppWebBridgeSettingsView()
-                        }
-                    }
-
-                    if manifest.id == linearMentionsExtensionID {
-                        SettingsCard(title: "Linear Login") {
-                            LinearOAuthSettingsView()
-                        }
-                    }
-
-                    if manifest.id == lastFmScrobblerExtensionID {
-                        SettingsCard(title: "Last.fm Login") {
-                            LastFmOAuthSettingsView()
-                        }
-                    }
 
                     SettingsCard(title: "Details") {
                         if let author = manifest.author?.name {
                             metadataRow(label: "Author", value: author)
                         }
-                        if manifest.id != linearMentionsExtensionID {
-                            metadataRow(label: "Refresh", value: "\(String(format: "%.1f", manifest.refreshInterval))s")
-                        }
+                        metadataRow(label: "Refresh", value: "\(String(format: "%.1f", manifest.refreshInterval))s")
                         metadataRow(label: "Triggers", value: manifest.activationTriggers.joined(separator: ", "))
 
                         if !manifest.permissions.isEmpty {
@@ -184,9 +162,9 @@ struct ExtensionsSettingsView: View {
                 Image(systemName: "puzzlepiece.extension")
                     .font(.system(size: 28))
                     .foregroundColor(.secondary)
-                Text("Select an extension")
+                Text(L("Select an extension"))
                     .font(.headline)
-                Text("Choose an extension from the left panel.")
+                Text(L("Choose an extension from the left panel."))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -212,7 +190,7 @@ struct ExtensionsSettingsView: View {
 
                 Spacer()
 
-                Text(manager.runtimes[manifest.id] == nil ? "Inactive" : "Active")
+                Text(manager.runtimes[manifest.id] == nil ? L("Inactive") : L("Active"))
                     .font(.caption.weight(.semibold))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
@@ -228,7 +206,7 @@ struct ExtensionsSettingsView: View {
                 .foregroundColor(.secondary)
 
             HStack(spacing: 10) {
-                Button(manager.runtimes[manifest.id] == nil ? "Activate" : "Reload") {
+                Button(manager.runtimes[manifest.id] == nil ? L("Activate") : L("Reload")) {
                     if manager.runtimes[manifest.id] == nil {
                         manager.activate(extensionID: manifest.id)
                     } else {
@@ -238,7 +216,7 @@ struct ExtensionsSettingsView: View {
                 .buttonStyle(.borderedProminent)
 
                 if manager.runtimes[manifest.id] != nil {
-                    Button("Deactivate") {
+                    Button(L("Deactivate")) {
                         manager.disableByUser(extensionID: manifest.id)
                     }
                     .buttonStyle(.bordered)
@@ -382,9 +360,9 @@ struct ExtensionsSettingsView: View {
 
     private func extensionSource(for manifest: ExtensionManifest) -> (label: String, color: Color) {
         if isInstalledExtension(manifest) {
-            return ("Installed", Color.accentColor)
+            return (L("Installed"), Color.accentColor)
         }
-        return ("Bundled", .secondary)
+        return (L("Bundled"), .secondary)
     }
 
     private func isInstalledExtension(_ manifest: ExtensionManifest) -> Bool {
@@ -423,491 +401,6 @@ struct ExtensionsSettingsView: View {
         colorScheme == .light
             ? Color(nsColor: .selectedControlColor).opacity(0.20)
             : Color.accentColor.opacity(0.25)
-    }
-}
-
-private struct LinearOAuthSettingsView: View {
-    private static let authorizeURLString = "https://api.supercmd.sh/auth/linear/authorize?app=superisland"
-    private static let oauthStoreKey = "extensions.\(linearMentionsExtensionID).store.oauth"
-
-    @ObservedObject private var manager = ExtensionManager.shared
-    @State private var session: LinearOAuthSession?
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(statusColor)
-                    .frame(width: 9, height: 9)
-                Text(statusTitle)
-                    .font(.system(size: 12, weight: .semibold))
-                Spacer()
-            }
-
-            Text(statusMessage)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-
-            HStack(spacing: 8) {
-                Button(primaryButtonTitle) {
-                    openAuthorizeURL()
-                }
-                .buttonStyle(.borderedProminent)
-
-                if session != nil {
-                    Button("Disconnect") {
-                        disconnect()
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.red)
-                }
-            }
-
-            if let session {
-                VStack(alignment: .leading, spacing: 4) {
-                    if !session.scope.isEmpty {
-                        Text("Scope: \(session.scope)")
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-
-                    if let expiresAt = session.expiresAt {
-                        Text(expirationLabel(expiresAt: expiresAt, isExpired: session.isExpired))
-                            .font(.system(size: 11))
-                            .foregroundColor(session.isExpired ? .red : .secondary)
-                    }
-                }
-            }
-        }
-        .onAppear {
-            reloadSession()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
-            reloadSession()
-        }
-    }
-
-    private var statusTitle: String {
-        if let session {
-            return session.isExpired ? "Expired" : "Logged in"
-        }
-        return "Not logged in"
-    }
-
-    private var statusColor: Color {
-        if let session {
-            return session.isExpired ? .orange : .green
-        }
-        return .secondary
-    }
-
-    private var statusMessage: String {
-        if let session {
-            if session.isExpired {
-                return "Your Linear session has expired. Authenticate again to resume mention syncing."
-            }
-            return "Linear is authenticated. New mentions will appear in the Super Island."
-        }
-        return "Authenticate with Linear to start mention notifications and inline replies."
-    }
-
-    private var primaryButtonTitle: String {
-        if let session {
-            return session.isExpired ? "Log In Again" : "Reconnect"
-        }
-        return "Log In to Linear"
-    }
-
-    private func reloadSession() {
-        session = LinearOAuthSession.load()
-    }
-
-    private func openAuthorizeURL() {
-        guard let url = URL(string: Self.authorizeURLString) else { return }
-        NSWorkspace.shared.open(url)
-    }
-
-    private func disconnect() {
-        UserDefaults.standard.removeObject(forKey: Self.oauthStoreKey)
-        UserDefaults.standard.synchronize()
-
-        if manager.runtimes[linearMentionsExtensionID] == nil {
-            manager.activate(extensionID: linearMentionsExtensionID)
-        }
-        manager.scheduleImmediateRefresh(extensionID: linearMentionsExtensionID)
-        reloadSession()
-    }
-
-    private func expirationLabel(expiresAt: Date, isExpired: Bool) -> String {
-        let formatted = expiresAt.formatted(date: .abbreviated, time: .shortened)
-        return isExpired ? "Expired at \(formatted)" : "Expires at \(formatted)"
-    }
-}
-
-private struct LinearOAuthSession {
-    private static let oauthStoreKey = "extensions.\(linearMentionsExtensionID).store.oauth"
-
-    let accessToken: String
-    let tokenType: String
-    let scope: String
-    let receivedAt: Date?
-    let expiresAt: Date?
-    let isExpired: Bool
-
-    static func load(defaults: UserDefaults = .standard) -> LinearOAuthSession? {
-        guard let dictionary = defaults.dictionary(forKey: oauthStoreKey) else {
-            return nil
-        }
-
-        let accessToken = normalizedText(dictionary["accessToken"] ?? dictionary["access_token"])
-        guard !accessToken.isEmpty else {
-            return nil
-        }
-
-        let tokenType = normalizedText(dictionary["tokenType"] ?? dictionary["token_type"])
-        let scope = normalizedText(dictionary["scope"])
-        let receivedAtSeconds = numericValue(dictionary["receivedAt"])
-        let expiresInSeconds = numericValue(dictionary["expiresIn"] ?? dictionary["expires_in"])
-
-        let receivedAt = receivedAtSeconds.flatMap { Date(timeIntervalSince1970: TimeInterval($0)) }
-        let expiresAt: Date? = {
-            guard let receivedAt, let expiresInSeconds, expiresInSeconds > 0 else { return nil }
-            return receivedAt.addingTimeInterval(TimeInterval(expiresInSeconds))
-        }()
-        let isExpired = expiresAt.map { $0 <= Date().addingTimeInterval(60) } ?? false
-
-        return LinearOAuthSession(
-            accessToken: accessToken,
-            tokenType: tokenType.isEmpty ? "Bearer" : tokenType,
-            scope: scope,
-            receivedAt: receivedAt,
-            expiresAt: expiresAt,
-            isExpired: isExpired
-        )
-    }
-
-    private static func normalizedText(_ value: Any?) -> String {
-        guard let string = value as? String else { return "" }
-        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed
-    }
-
-    private static func numericValue(_ value: Any?) -> Int? {
-        if let number = value as? NSNumber {
-            return number.intValue
-        }
-        if let string = value as? String, let number = Int(string) {
-            return number
-        }
-        return nil
-    }
-}
-
-private struct LastFmOAuthSettingsView: View {
-    private static let authorizeURLString = "https://api.supercmd.sh/auth/lastfm/authorize?app=superisland"
-    private static let oauthStoreKey = "extensions.\(lastFmScrobblerExtensionID).store.oauth"
-
-    @ObservedObject private var manager = ExtensionManager.shared
-    @State private var session: LastFmOAuthSession?
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(statusColor)
-                    .frame(width: 9, height: 9)
-                Text(statusTitle)
-                    .font(.system(size: 12, weight: .semibold))
-                Spacer()
-            }
-
-            Text(statusMessage)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-
-            HStack(spacing: 8) {
-                Button(primaryButtonTitle) {
-                    openAuthorizeURL()
-                }
-                .buttonStyle(.borderedProminent)
-
-                if session != nil {
-                    Button("Disconnect") {
-                        disconnect()
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.red)
-                }
-            }
-
-            if let session {
-                VStack(alignment: .leading, spacing: 4) {
-                    if !session.username.isEmpty {
-                        Text("Account: \(session.username)")
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-
-                    if !session.scope.isEmpty {
-                        Text("Scope: \(session.scope)")
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-
-                    if let expiresAt = session.expiresAt {
-                        Text(expirationLabel(expiresAt: expiresAt, isExpired: session.isExpired))
-                            .font(.system(size: 11))
-                            .foregroundColor(session.isExpired ? .red : .secondary)
-                    }
-                }
-            }
-        }
-        .onAppear {
-            reloadSession()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
-            reloadSession()
-        }
-    }
-
-    private var statusTitle: String {
-        if let session {
-            return session.isExpired ? "Expired" : "Logged in"
-        }
-        return "Not logged in"
-    }
-
-    private var statusColor: Color {
-        if let session {
-            return session.isExpired ? .orange : .green
-        }
-        return .secondary
-    }
-
-    private var statusMessage: String {
-        if let session {
-            if session.isExpired {
-                return "Your Last.fm session has expired. Authenticate again to resume scrobbling."
-            }
-            if !session.username.isEmpty {
-                return "Last.fm is connected as \(session.username). New plays will scrobble automatically."
-            }
-            return "Last.fm is connected. New plays will scrobble automatically."
-        }
-        return "Authenticate with Last.fm to start scrobbling your listening history."
-    }
-
-    private var primaryButtonTitle: String {
-        if let session {
-            return session.isExpired ? "Log In Again" : "Reconnect"
-        }
-        return "Log In to Last.fm"
-    }
-
-    private func reloadSession() {
-        session = LastFmOAuthSession.load()
-    }
-
-    private func openAuthorizeURL() {
-        guard let url = URL(string: Self.authorizeURLString) else { return }
-        NSWorkspace.shared.open(url)
-    }
-
-    private func disconnect() {
-        UserDefaults.standard.removeObject(forKey: Self.oauthStoreKey)
-        UserDefaults.standard.synchronize()
-
-        if manager.runtimes[lastFmScrobblerExtensionID] == nil {
-            manager.activate(extensionID: lastFmScrobblerExtensionID)
-        }
-        manager.scheduleImmediateRefresh(extensionID: lastFmScrobblerExtensionID)
-        reloadSession()
-    }
-
-    private func expirationLabel(expiresAt: Date, isExpired: Bool) -> String {
-        let formatted = expiresAt.formatted(date: .abbreviated, time: .shortened)
-        return isExpired ? "Expired at \(formatted)" : "Expires at \(formatted)"
-    }
-}
-
-private struct LastFmOAuthSession {
-    private static let oauthStoreKey = "extensions.\(lastFmScrobblerExtensionID).store.oauth"
-
-    let accessToken: String
-    let tokenType: String
-    let scope: String
-    let username: String
-    let receivedAt: Date?
-    let expiresAt: Date?
-    let isExpired: Bool
-
-    static func load(defaults: UserDefaults = .standard) -> LastFmOAuthSession? {
-        guard let dictionary = defaults.dictionary(forKey: oauthStoreKey) else {
-            return nil
-        }
-
-        let accessToken = normalizedText(dictionary["accessToken"] ?? dictionary["access_token"])
-        guard !accessToken.isEmpty else {
-            return nil
-        }
-
-        let tokenType = normalizedText(dictionary["tokenType"] ?? dictionary["token_type"])
-        let scope = normalizedText(dictionary["scope"])
-        let username = normalizedText(dictionary["username"] ?? dictionary["name"])
-        let receivedAtSeconds = numericValue(dictionary["receivedAt"])
-        let expiresInSeconds = numericValue(dictionary["expiresIn"] ?? dictionary["expires_in"])
-
-        let receivedAt = receivedAtSeconds.flatMap { Date(timeIntervalSince1970: TimeInterval($0)) }
-        let expiresAt: Date? = {
-            guard let receivedAt, let expiresInSeconds, expiresInSeconds > 0 else { return nil }
-            return receivedAt.addingTimeInterval(TimeInterval(expiresInSeconds))
-        }()
-        let isExpired = expiresAt.map { $0 <= Date().addingTimeInterval(60) } ?? false
-
-        return LastFmOAuthSession(
-            accessToken: accessToken,
-            tokenType: tokenType.isEmpty ? "Bearer" : tokenType,
-            scope: scope,
-            username: username,
-            receivedAt: receivedAt,
-            expiresAt: expiresAt,
-            isExpired: isExpired
-        )
-    }
-
-    private static func normalizedText(_ value: Any?) -> String {
-        guard let string = value as? String else { return "" }
-        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed
-    }
-
-    private static func numericValue(_ value: Any?) -> Int? {
-        if let number = value as? NSNumber {
-            return number.intValue
-        }
-        if let string = value as? String, let number = Int(string) {
-            return number
-        }
-        return nil
-    }
-}
-
-private struct WhatsAppWebBridgeSettingsView: View {
-    @ObservedObject private var bridge = WhatsAppWebBridge.shared
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(stateColor)
-                    .frame(width: 9, height: 9)
-                Text(stateTitle)
-                    .font(.system(size: 12, weight: .semibold))
-                Spacer()
-            }
-
-            Text(bridge.statusText)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-
-            HStack(spacing: 8) {
-                if bridge.connectionState == .loggedIn {
-                    Button("Log Out") {
-                        bridge.logout()
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.red)
-                } else {
-                    Button("Start Login") {
-                        bridge.start()
-                    }
-                    .buttonStyle(.borderedProminent)
-
-                    Button("Refresh QR") {
-                        bridge.refreshQRCode()
-                    }
-                    .buttonStyle(.bordered)
-                }
-            }
-
-            if bridge.connectionState == .loggedIn {
-                Text("Connected. New messages will be synced from this login.")
-                    .font(.system(size: 11))
-                    .foregroundColor(.secondary)
-            } else if let image = qrImage {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Scan this QR with WhatsApp on your phone")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.secondary)
-
-                    Image(nsImage: image)
-                        .resizable()
-                        .interpolation(.none)
-                        .scaledToFit()
-                        .frame(maxWidth: 220, maxHeight: 220)
-                        .padding(8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(Color.white)
-                        )
-                }
-            } else {
-                HStack(spacing: 8) {
-                    ProgressView()
-                        .controlSize(.small)
-                    Text("Preparing secure login session...")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                }
-            }
-
-            if let error = bridge.lastError, !error.isEmpty {
-                Text(error)
-                    .font(.system(size: 11))
-                    .foregroundColor(.red)
-            }
-        }
-        .onAppear {
-            bridge.start()
-        }
-    }
-
-    private var stateTitle: String {
-        switch bridge.connectionState {
-        case .idle:
-            return "Idle"
-        case .loading:
-            return "Loading"
-        case .qrReady:
-            return "QR Ready"
-        case .loggedIn:
-            return "Connected"
-        case .error:
-            return "Error"
-        }
-    }
-
-    private var stateColor: Color {
-        switch bridge.connectionState {
-        case .idle:
-            return .secondary
-        case .loading:
-            return .orange
-        case .qrReady:
-            return .blue
-        case .loggedIn:
-            return .green
-        case .error:
-            return .red
-        }
-    }
-
-    private var qrImage: NSImage? {
-        guard let dataURL = bridge.qrCodeDataURL else { return nil }
-        guard let commaIndex = dataURL.firstIndex(of: ",") else { return nil }
-        let encoded = String(dataURL[dataURL.index(after: commaIndex)...])
-        guard let data = Data(base64Encoded: encoded) else { return nil }
-        return NSImage(data: data)
     }
 }
 

@@ -6,7 +6,7 @@ struct WeatherData {
     var temperature: Double = 0
     var temperatureHigh: Double = 0
     var temperatureLow: Double = 0
-    var condition: String = "Clear"
+    var condition: String = L("Clear")
     var conditionIcon: String = "sun.max.fill"
     var locationName: String = ""
     var hourlyForecast: [HourlyWeather] = []
@@ -173,7 +173,7 @@ final class WeatherManager: NSObject, ObservableObject {
             for i in startIndex..<endIndex {
                 let hourStr: String
                 if i == currentHour {
-                    hourStr = "Now"
+                    hourStr = L("Now")
                 } else {
                     let hour = i % 24
                     hourStr = hour == 0 ? "12 AM" : (hour <= 12 ? "\(hour) \(hour < 12 ? "AM" : "PM")" : "\(hour - 12) PM")
@@ -193,19 +193,19 @@ final class WeatherManager: NSObject, ObservableObject {
 
     private func conditionName(for code: Int) -> String {
         switch code {
-        case 0: return "Clear"
-        case 1, 2, 3: return "Partly Cloudy"
-        case 45, 48: return "Foggy"
-        case 51, 53, 55: return "Drizzle"
-        case 61, 63, 65: return "Rain"
-        case 66, 67: return "Freezing Rain"
-        case 71, 73, 75: return "Snow"
-        case 77: return "Snow Grains"
-        case 80, 81, 82: return "Showers"
-        case 85, 86: return "Snow Showers"
-        case 95: return "Thunderstorm"
-        case 96, 99: return "Hailstorm"
-        default: return "Clear"
+        case 0: return L("Clear")
+        case 1, 2, 3: return L("Partly Cloudy")
+        case 45, 48: return L("Foggy")
+        case 51, 53, 55: return L("Drizzle")
+        case 61, 63, 65: return L("Rain")
+        case 66, 67: return L("Freezing Rain")
+        case 71, 73, 75: return L("Snow")
+        case 77: return L("Snow Grains")
+        case 80, 81, 82: return L("Showers")
+        case 85, 86: return L("Snow Showers")
+        case 95: return L("Thunderstorm")
+        case 96, 99: return L("Hailstorm")
+        default: return L("Clear")
         }
     }
 

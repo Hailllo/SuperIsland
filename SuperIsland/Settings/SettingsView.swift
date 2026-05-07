@@ -7,11 +7,11 @@ enum SettingsPane: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .general:    "General"
-        case .modules:    "Modules"
-        case .appearance: "Appearance"
-        case .extensions: "Extensions"
-        case .advanced:   "Advanced"
+        case .general:    L("General")
+        case .modules:    L("Modules")
+        case .appearance: L("Appearance")
+        case .extensions: L("Extensions")
+        case .advanced:   L("Advanced")
         }
     }
 
@@ -100,7 +100,7 @@ struct SettingsView: View {
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .frame(width: 18, alignment: .center)
-                Text("Quit")
+                Text(L("Quit"))
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                 Spacer()
@@ -151,8 +151,8 @@ struct SettingSectionLabel: View {
     let title: String
 
     var body: some View {
-        Text(title)
-            .font(.system(size: 11))
+            Text(L(title))
+                .font(.system(size: 11))
             .foregroundColor(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -194,9 +194,9 @@ struct SettingToggleRow: View {
     var body: some View {
         HStack(alignment: description != nil ? .top : .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 13))
+                Text(L(title)).font(.system(size: 13))
                 if let desc = description {
-                    Text(desc)
+                    Text(L(desc))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -260,10 +260,10 @@ struct SettingsCard<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 3) {
-                Text(title)
+                Text(L(title))
                     .font(.system(size: 12, weight: .medium))
                 if let subtitle {
-                    Text(subtitle)
+                    Text(L(subtitle))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }

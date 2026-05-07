@@ -22,7 +22,7 @@ struct NotificationCompactView: View {
                         .foregroundStyle(.white.opacity(0.7))
                 }
             } else {
-                Text("No notifications")
+                Text(L("No notifications"))
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.5))
             }

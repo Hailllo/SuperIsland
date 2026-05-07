@@ -32,7 +32,7 @@ struct CalendarExpandedView: View {
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
                 Spacer()
-                Text("\(manager.todayEvents.count) events")
+                Text(L("%d events", manager.todayEvents.count))
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.5))
             }
@@ -59,7 +59,7 @@ struct CalendarExpandedView: View {
 
                         if let url = manager.joinURL(for: event) {
                             Button(action: { NSWorkspace.shared.open(url) }) {
-                                Text("Join")
+                                Text(L("Join"))
                                     .font(.system(size: 10, weight: .semibold))
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 8)
@@ -71,7 +71,7 @@ struct CalendarExpandedView: View {
                         }
                     }
                 } else {
-                    Text("No more events today")
+                    Text(L("No more events today"))
                         .font(.system(size: 12))
                         .foregroundColor(.white.opacity(0.5))
                 }
@@ -126,7 +126,7 @@ struct CalendarExpandedView: View {
                     Spacer(minLength: 4)
 
                     if !isCurrentMonthVisible {
-                        Button("Today") {
+                        Button(L("Today")) {
                             manager.resetDisplayedMonthToCurrent()
                             manager.selectDate(Date())
                         }
@@ -188,7 +188,7 @@ struct CalendarExpandedView: View {
 
             if manager.selectedDateEvents.isEmpty {
                 Spacer()
-                Text("No events")
+                Text(L("No events"))
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.white.opacity(0.4))
                     .frame(maxWidth: .infinity)
@@ -210,14 +210,14 @@ struct CalendarExpandedView: View {
 
     private var upcomingPanel: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Upcoming")
+            Text(L("Upcoming"))
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.white)
                 .padding(.bottom, 8)
 
             if manager.upcomingWeekEvents.isEmpty {
                 Spacer()
-                Text("Nothing this week")
+                Text(L("Nothing this week"))
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.white.opacity(0.4))
                     .frame(maxWidth: .infinity)
@@ -255,7 +255,7 @@ struct CalendarExpandedView: View {
                     Spacer(minLength: 0)
 
                     if event.isAllDay {
-                        Text("All Day")
+                        Text(L("All Day"))
                             .font(.system(size: 9, weight: .medium))
                             .foregroundColor(.white.opacity(0.35))
                     } else {
@@ -267,7 +267,7 @@ struct CalendarExpandedView: View {
             }
 
             if events.count > 3 {
-                Text("+\(events.count - 3) more")
+                Text(L("+%d more", events.count - 3))
                     .font(.system(size: 9, weight: .medium))
                     .foregroundColor(.white.opacity(0.3))
                     .padding(.leading, 8)
@@ -277,7 +277,7 @@ struct CalendarExpandedView: View {
 
     private func upcomingDayLabel(for date: Date) -> String {
         if calendar.isDateInTomorrow(date) {
-            return "Tomorrow"
+            return L("Tomorrow")
         }
         return Self.upcomingDayFormatter.string(from: date)
     }
@@ -296,7 +296,7 @@ struct CalendarExpandedView: View {
                     .lineLimit(1)
 
                 if event.isAllDay {
-                    Text("All Day")
+                    Text(L("All Day"))
                         .font(.system(size: 10, weight: .medium))
                         .foregroundColor(.white.opacity(0.45))
                 } else {
@@ -411,13 +411,13 @@ struct CalendarExpandedView: View {
 
     private var selectedDateTitle: String {
         if calendar.isDateInToday(manager.selectedDate) {
-            return "Today"
+            return L("Today")
         }
         if calendar.isDateInYesterday(manager.selectedDate) {
-            return "Yesterday"
+            return L("Yesterday")
         }
         if calendar.isDateInTomorrow(manager.selectedDate) {
-            return "Tomorrow"
+            return L("Tomorrow")
         }
         return Self.selectedDateFormatter.string(from: manager.selectedDate)
     }
@@ -425,7 +425,7 @@ struct CalendarExpandedView: View {
     private var eventCountLabel: String {
         let count = manager.selectedDateEvents.count
         if count == 0 { return "" }
-        return count == 1 ? "1 event" : "\(count) events"
+        return count == 1 ? L("1 event") : L("%d events", count)
     }
 
     private var monthTitle: String {

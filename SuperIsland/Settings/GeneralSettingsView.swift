@@ -99,13 +99,32 @@ struct GeneralSettingsView: View {
             SettingSectionLabel(title: "Startup")
             SettingGroup {
                 HStack {
-                    Text("Launch at login").font(.system(size: 13))
+                    Text(L("Launch at login")).font(.system(size: 13))
                     Spacer()
                     Toggle("", isOn: $launchAtLogin)
                         .labelsHidden()
                         .onChange(of: launchAtLogin) { _, newValue in
                             newValue ? LaunchAtLogin.enable() : LaunchAtLogin.disable()
                         }
+                }
+                .padding(.horizontal, 16).padding(.vertical, 11)
+
+                SettingRowDivider()
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L("Language")).font(.system(size: 13))
+                        Text(L("Display language"))
+                            .font(.system(size: 11)).foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Picker("", selection: $appState.language) {
+                        ForEach(AppLanguage.allCases) { language in
+                            Text(language.displayName).tag(language)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .frame(width: 120)
                 }
                 .padding(.horizontal, 16).padding(.vertical, 11)
 
@@ -127,12 +146,12 @@ struct GeneralSettingsView: View {
                 SettingToggleRow(title: "Hide on fullscreen", isOn: $appState.hideOnFullscreen)
                 SettingRowDivider()
                 HStack {
-                    Text("Animation Speed").font(.system(size: 13))
+                    Text(L("Animation Speed")).font(.system(size: 13))
                     Spacer()
                     Picker("", selection: $appState.animationSpeed) {
-                        Text("Normal").tag(1.0)
-                        Text("Reduced").tag(1.5)
-                        Text("Minimal").tag(2.0)
+                        Text(L("Normal")).tag(1.0)
+                        Text(L("Reduced")).tag(1.5)
+                        Text(L("Minimal")).tag(2.0)
                     }
                     .pickerStyle(.menu)
                     .labelsHidden()
@@ -146,8 +165,8 @@ struct GeneralSettingsView: View {
             SettingGroup {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Expanded collapse delay").font(.system(size: 13))
-                        Text("How long expanded content stays visible")
+                        Text(L("Expanded collapse delay")).font(.system(size: 13))
+                        Text(L("How long expanded content stays visible"))
                             .font(.system(size: 11)).foregroundColor(.secondary)
                     }
                     Spacer(minLength: 12)
@@ -162,8 +181,8 @@ struct GeneralSettingsView: View {
                 SettingRowDivider()
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Hover expand delay").font(.system(size: 13))
-                        Text("How long to hover the notch before it peeks open")
+                        Text(L("Hover expand delay")).font(.system(size: 13))
+                        Text(L("How long to hover the notch before it peeks open"))
                             .font(.system(size: 11)).foregroundColor(.secondary)
                     }
                     Spacer(minLength: 12)
@@ -183,8 +202,8 @@ struct GeneralSettingsView: View {
                 SettingRowDivider()
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Notch haptic intensity").font(.system(size: 13))
-                        Text("Feedback strength when entering the notch")
+                        Text(L("Notch haptic intensity")).font(.system(size: 13))
+                        Text(L("Feedback strength when entering the notch"))
                             .font(.system(size: 11)).foregroundColor(.secondary)
                     }
                     Spacer(minLength: 12)
@@ -266,18 +285,18 @@ struct GeneralSettingsView: View {
                 .frame(width: 18, alignment: .center)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 13))
-                Text(description).font(.system(size: 11)).foregroundColor(.secondary)
+                Text(L(title)).font(.system(size: 13))
+                Text(L(description)).font(.system(size: 11)).foregroundColor(.secondary)
             }
 
             Spacer()
 
             if permissionGranted(permission) {
-                Label("Granted", systemImage: "checkmark.circle.fill")
+                Label(L("Granted"), systemImage: "checkmark.circle.fill")
                     .font(.system(size: 11))
                     .foregroundColor(.green)
             } else {
-                Button("Grant Access") { requestPermission(permission) }
+                Button(L("Grant Access")) { requestPermission(permission) }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
             }

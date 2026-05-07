@@ -122,11 +122,11 @@ struct WeatherExpandedView: View {
         let uv = manager.weather.uvIndex
         let level: String
         switch uv {
-        case ..<3: level = "Low"
-        case ..<6: level = "Mod"
-        case ..<8: level = "High"
-        case ..<11: level = "Very High"
-        default: level = "Extreme"
+        case ..<3: level = L("Low")
+        case ..<6: level = L("Mod")
+        case ..<8: level = L("High")
+        case ..<11: level = L("Very High")
+        default: level = L("Extreme")
         }
         return "\(Int(uv)) \(level)"
     }
@@ -136,12 +136,12 @@ struct WeatherExpandedView: View {
         if aqi == 0 { return "—" }
         let level: String
         switch aqi {
-        case ..<51: level = "Good"
-        case ..<101: level = "Moderate"
-        case ..<151: level = "Unhealthy*"
-        case ..<201: level = "Unhealthy"
-        case ..<301: level = "Very Poor"
-        default: level = "Hazardous"
+        case ..<51: level = L("Good")
+        case ..<101: level = L("Moderate")
+        case ..<151: level = L("Unhealthy*")
+        case ..<201: level = L("Unhealthy")
+        case ..<301: level = L("Very Poor")
+        default: level = L("Hazardous")
         }
         return "\(aqi) \(level)"
     }

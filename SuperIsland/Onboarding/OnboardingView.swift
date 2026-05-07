@@ -294,11 +294,11 @@ private struct WelcomeScreen: View {
                 .padding(.bottom, 24)
 
             VStack(spacing: 8) {
-                Text("Welcome to SuperIsland")
+                Text(L("Welcome to SuperIsland"))
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(OBColors.textPrimary)
 
-                Text("Your notch, reimagined. A quick setup\nand you're ready to go.")
+                Text(L("Your notch, reimagined. A quick setup\nand you're ready to go."))
                     .font(.system(size: 14, weight: .regular))
                     .foregroundStyle(OBColors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -309,7 +309,7 @@ private struct WelcomeScreen: View {
 
             Spacer(minLength: 20)
 
-            PrimaryButton(title: "Get Started", action: next)
+            PrimaryButton(title: L("Get Started"), action: next)
                 .opacity(showContent ? 1 : 0)
         }
         .frame(maxWidth: OnboardingMetrics.contentWidth)
@@ -343,11 +343,11 @@ private struct PermissionsScreen: View {
                 .padding(.bottom, 20)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Permissions")
+                Text(L("Permissions"))
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(OBColors.textPrimary)
 
-                Text("SuperIsland needs a few permissions to work properly.")
+                Text(L("SuperIsland needs a few permissions to work properly."))
                     .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(OBColors.textSecondary)
             }
@@ -366,7 +366,7 @@ private struct PermissionsScreen: View {
 
             Spacer(minLength: 0)
 
-            PrimaryButton(title: "Continue", action: next)
+            PrimaryButton(title: L("Continue"), action: next)
         }
         .frame(maxWidth: OnboardingMetrics.contentWidth, maxHeight: .infinity, alignment: .top)
     }
@@ -395,7 +395,7 @@ private struct PermissionRow: View {
                         .foregroundStyle(OBColors.textPrimary)
 
                     if permission.isRequired {
-                        Text("Required")
+                        Text(L("Required"))
                             .font(.system(size: 9, weight: .bold, design: .rounded))
                             .foregroundStyle(Color.white.opacity(0.4))
                             .padding(.horizontal, 5)
@@ -416,7 +416,7 @@ private struct PermissionRow: View {
                 GrantedBadge()
             } else {
                 Button(action: action) {
-                    Text(permission == .bluetooth ? "Open Settings" : "Grant")
+                    Text(permission == .bluetooth ? L("Open Settings") : L("Grant"))
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(Color.white.opacity(0.85))
                         .padding(.horizontal, 12)
@@ -441,7 +441,7 @@ private struct GrantedBadge: View {
         HStack(spacing: 4) {
             Image(systemName: "checkmark")
                 .font(.system(size: 8, weight: .bold))
-            Text("Granted")
+            Text(L("Granted"))
                 .font(.system(size: 11, weight: .semibold))
         }
         .foregroundStyle(OBColors.accent)
@@ -489,11 +489,11 @@ private struct GesturesScreen: View {
 
             // Gesture instructions
             VStack(spacing: 6) {
-                Text("Swipe the island")
+                Text(L("Swipe the island"))
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                     .foregroundStyle(OBColors.textPrimary)
 
-                Text("Swipe left or right on the notch to switch between modules.")
+                Text(L("Swipe left or right on the notch to switch between modules."))
                     .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(OBColors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -501,7 +501,7 @@ private struct GesturesScreen: View {
 
             Spacer(minLength: 0)
 
-            PrimaryButton(title: "Understood", action: next)
+            PrimaryButton(title: L("Understood"), action: next)
         }
         .frame(maxWidth: OnboardingMetrics.contentWidth, maxHeight: .infinity)
         .onAppear {
@@ -527,7 +527,7 @@ private struct SwipeIndicator: View {
                 .font(.system(size: 34, weight: .regular))
                 .foregroundStyle(.white.opacity(0.85))
 
-            Text("SWIPE")
+            Text(L("SWIPE"))
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.7))
                 .tracking(1.5)
@@ -569,22 +569,15 @@ private struct OnboardingExtensionInfo: Identifiable {
     static let available: [OnboardingExtensionInfo] = [
         OnboardingExtensionInfo(
             id: "superisland.pomodoro",
-            name: "Pomodoro Timer",
-            description: "Focus timer with countdown in the island",
+            name: L("Pomodoro Timer"),
+            description: L("Focus timer with countdown in the island"),
             fallbackIcon: "timer",
             badge: nil
         ),
         OnboardingExtensionInfo(
-            id: "superisland.whatsapp-web",
-            name: "WhatsApp Web",
-            description: "Route WhatsApp messages to the island",
-            fallbackIcon: "message.fill",
-            badge: "Requires Login"
-        ),
-        OnboardingExtensionInfo(
             id: "superisland.ai-usage",
-            name: "AI Usage",
-            description: "Claude & Codex usage rings in the notch",
+            name: L("AI Usage"),
+            description: L("Claude & Codex usage rings in the notch"),
             fallbackIcon: "brain.head.profile",
             badge: nil
         ),
@@ -602,11 +595,11 @@ private struct ExtensionsScreen: View {
                 .padding(.bottom, 20)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Extensions")
+                Text(L("Extensions"))
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(OBColors.textPrimary)
 
-                Text("Add extra capabilities to your island.")
+                Text(L("Add extra capabilities to your island."))
                     .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(OBColors.textSecondary)
             }
@@ -631,7 +624,7 @@ private struct ExtensionsScreen: View {
 
             Spacer(minLength: 0)
 
-            PrimaryButton(title: "Continue", action: next)
+            PrimaryButton(title: L("Continue"), action: next)
         }
         .frame(maxWidth: OnboardingMetrics.contentWidth, maxHeight: .infinity, alignment: .top)
     }
@@ -671,7 +664,7 @@ private struct ExtensionRow: View {
             Spacer(minLength: 4)
 
             Button(action: toggle) {
-                Text(isEnabled ? "Added" : "Add")
+                Text(isEnabled ? L("Added") : L("Add"))
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(isEnabled ? OBColors.accent : Color.white.opacity(0.85))
                     .padding(.horizontal, 14)
@@ -735,7 +728,7 @@ private struct ReadyScreen: View {
         let names = OnboardingExtensionInfo.available
             .filter { enabledExtensions.contains($0.id) }
             .map(\.name)
-        if names.isEmpty { return "None" }
+        if names.isEmpty { return L("None") }
         return names.joined(separator: ", ")
     }
 
@@ -750,11 +743,11 @@ private struct ReadyScreen: View {
                 .padding(.bottom, 20)
 
             VStack(spacing: 8) {
-                Text("You're all set")
+                Text(L("You're all set"))
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(OBColors.textPrimary)
 
-                Text("SuperIsland will run in the background.")
+                Text(L("SuperIsland will run in the background."))
                     .font(.system(size: 14, weight: .regular))
                     .foregroundStyle(OBColors.textSecondary)
             }
@@ -765,7 +758,7 @@ private struct ReadyScreen: View {
                 SummaryRow(
                     icon: "checkmark.shield.fill",
                     title: "Permissions",
-                    detail: "\(grantedCount) of 4 granted",
+                    detail: L("%d of 4 granted", grantedCount),
                     isFirst: true
                 )
                 SummaryRow(
@@ -788,7 +781,7 @@ private struct ReadyScreen: View {
                 )
 
                 Button(action: openSettings) {
-                    Text("Open Settings Instead")
+                    Text(L("Open Settings Instead"))
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.white.opacity(0.35))
                 }
@@ -812,7 +805,7 @@ private struct SummaryRow: View {
                 .foregroundStyle(OBColors.accent)
                 .frame(width: 24)
 
-            Text(title)
+            Text(L(title))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(OBColors.textPrimary)
 
@@ -839,7 +832,7 @@ private struct PrimaryButton: View {
 
     var body: some View {
         Button(action: action) {
-            Text(title)
+            Text(L(title))
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color.black.opacity(isDisabled ? 0.5 : 0.92))
                 .frame(width: 200, height: 42)
@@ -866,7 +859,7 @@ private struct NavBackButton: View {
             HStack(spacing: 4) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 11, weight: .semibold))
-                Text("Back")
+                Text(L("Back"))
                     .font(.system(size: 13, weight: .medium))
             }
             .foregroundStyle(Color.white.opacity(0.55))
@@ -1060,9 +1053,9 @@ private extension PermissionType {
     var requestActionTitle: String {
         switch self {
         case .bluetooth:
-            return "Open Settings"
+            return L("Open Settings")
         default:
-            return "Request Access"
+            return L("Request Access")
         }
     }
 }

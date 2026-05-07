@@ -15,7 +15,7 @@ final class TeleprompterScriptEditorWindowController {
         let hostingController = NSHostingController(rootView: rootView)
 
         let window = NSWindow(contentViewController: hostingController)
-        window.title = "Teleprompter Script"
+        window.title = L("Teleprompter Script")
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.setContentSize(NSSize(width: 560, height: 460))
         window.minSize = NSSize(width: 400, height: 340)
@@ -65,7 +65,7 @@ struct TeleprompterScriptEditorView: View {
         HStack(spacing: 16) {
             // Title + word count
             VStack(alignment: .leading, spacing: 2) {
-                Text("Script")
+                Text(L("Script"))
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(.white.opacity(0.82))
                 Text(wordCountLabel)
@@ -86,7 +86,7 @@ struct TeleprompterScriptEditorView: View {
             toolbarButton(icon: "trash", color: .white.opacity(0.45)) {
                 draftText = ""
             }
-            .help("Clear")
+            .help(L("Clear"))
 
             // Done (filled circle checkmark — stands out against the dark bg)
             Button { applyAndClose() } label: {
@@ -102,7 +102,7 @@ struct TeleprompterScriptEditorView: View {
             .buttonStyle(.plain)
             .hoverPointer()
             .keyboardShortcut(.return, modifiers: .command)
-            .help("Done (⌘↩)")
+            .help(L("Done (⌘↩)"))
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 11)
@@ -147,7 +147,7 @@ struct TeleprompterScriptEditorView: View {
                 .font(.system(size: 10))
                 .foregroundColor(.white.opacity(0.18))
                 .padding(.trailing, 5)
-            Text("Text scrolls upward in the island as you speak.")
+            Text(L("Text scrolls upward in the island as you speak."))
                 .font(.system(size: 11))
                 .foregroundColor(.white.opacity(0.22))
             Spacer()
@@ -181,6 +181,6 @@ struct TeleprompterScriptEditorView: View {
 
     private func applyAndClose() {
         manager.setScript(draftText)
-        NSApp.windows.first(where: { $0.title == "Teleprompter Script" })?.close()
+        NSApp.windows.first(where: { $0.title == L("Teleprompter Script") })?.close()
     }
 }

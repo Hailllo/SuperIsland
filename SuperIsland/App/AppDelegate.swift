@@ -5,10 +5,6 @@ import Combine
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private static let linearExtensionID = "superisland.linear-mentions"
-    private static let linearOAuthStoreKey = "extensions.\(linearExtensionID).store.oauth"
-    private static let lastFmExtensionID = "superisland.lastfm-scrobbler"
-    private static let lastFmOAuthStoreKey = "extensions.\(lastFmExtensionID).store.oauth"
     private var islandWindowController: IslandWindowController?
     private var onboardingWindowController: OnboardingWindowController?
     private var updateWindowController: UpdateWindowController?
@@ -26,7 +22,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             "build": Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
         ])
 
-        registerURLHandler()
         installQuitHotkeyMonitor()
 
         // defaults write com.workview.SuperIsland "debug.alwaysShowOnboarding" -bool true
@@ -151,107 +146,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         controller.show()
     }
 
-    private func registerURLHandler() {
-        NSAppleEventManager.shared().setEventHandler(
-            self,
-            andSelector: #selector(handleIncomingURL(event:replyEvent:)),
-            forEventClass: AEEventClass(kInternetEventClass),
-            andEventID: AEEventID(kAEGetURL)
-        )
-    }
-
     private func installQuitHotkeyMonitor() {
         guard quitHotkeyMonitor == nil else { return }
 
         quitHotkeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             QuitHotkeyGuard.shouldBlock(event) ? nil : event
         }
-    }
-
-    @objc
-    private func handleIncomingURL(event: NSAppleEventDescriptor, replyEvent: NSAppleEventDescriptor?) {
-        guard let urlString = event.paramDescriptor(forKeyword: AEKeyword(keyDirectObject))?.stringValue,
-              let url = URL(string: urlString) else {
-            return
-        }
-
-        handleOAuthCallback(url: url)
-    }
-
-    private func handleOAuthCallback(url: URL) {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              components.scheme?.lowercased() == "superisland",
-              components.host?.lowercased() == "auth",
-              components.path.lowercased() == "/callback" else {
-            return
-        }
-
-        var queryItems: [String: String] = [:]
-        for item in components.queryItems ?? [] {
-            queryItems[item.name.lowercased()] = item.value ?? ""
-        }
-
-        let provider = queryItems["provider"]?.lowercased() ?? ""
-        let routing: (extensionID: String, storeKey: String, label: String)?
-        switch provider {
-        case "linear":
-            routing = (Self.linearExtensionID, Self.linearOAuthStoreKey, "Linear")
-        case "lastfm":
-            routing = (Self.lastFmExtensionID, Self.lastFmOAuthStoreKey, "Last.fm")
-        default:
-            routing = nil
-        }
-        guard let routing else {
-            return
-        }
-
-        let accessToken = queryItems["access_token"]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        guard !accessToken.isEmpty else {
-            ExtensionLogger.shared.log(routing.extensionID, .warning, "Received \(routing.label) OAuth callback without access token")
-            return
-        }
-
-        let expiresIn = Int(queryItems["expires_in"] ?? "") ?? 0
-        var payload: [String: Any] = [
-            "provider": provider,
-            "accessToken": accessToken,
-            "access_token": accessToken,
-            "tokenType": queryItems["token_type"] ?? "Bearer",
-            "token_type": queryItems["token_type"] ?? "Bearer",
-            "expiresIn": expiresIn,
-            "expires_in": expiresIn,
-            "scope": queryItems["scope"] ?? "",
-            "receivedAt": Int(Date().timeIntervalSince1970),
-            "callbackURL": url.absoluteString
-        ]
-
-        if let username = queryItems["username"], !username.isEmpty {
-            payload["username"] = username
-        }
-        if let name = queryItems["name"], !name.isEmpty, payload["username"] == nil {
-            payload["username"] = name
-        }
-
-        if provider == "lastfm" {
-            if let apiKey = queryItems["api_key"], !apiKey.isEmpty {
-                payload["apiKey"] = apiKey
-                payload["api_key"] = apiKey
-            }
-            if let apiSecret = queryItems["api_secret"], !apiSecret.isEmpty {
-                payload["apiSecret"] = apiSecret
-                payload["api_secret"] = apiSecret
-            }
-        }
-
-        UserDefaults.standard.set(payload as NSDictionary, forKey: routing.storeKey)
-        UserDefaults.standard.synchronize()
-
-        let extensions = ExtensionManager.shared
-        if extensions.runtimes[routing.extensionID] == nil {
-            extensions.activate(extensionID: routing.extensionID)
-        }
-        extensions.scheduleImmediateRefresh(extensionID: routing.extensionID)
-        ExtensionLogger.shared.log(routing.extensionID, .info, "Stored \(routing.label) OAuth token from callback")
     }
 
     // MARK: - Island Window
@@ -295,7 +195,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(makeMenuItem(title: "Battery", action: #selector(showBattery)))
         menu.addItem(NSMenuItem.separator())
 
-        let modulesItem = NSMenuItem(title: "Modules", action: nil, keyEquivalent: "")
+        let modulesItem = NSMenuItem(title: L("Modules"), action: nil, keyEquivalent: "")
         let modulesMenu = NSMenu()
 
         for module in ModuleType.allCases {
@@ -434,7 +334,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let hostingController = NSHostingController(rootView: rootView)
 
         let window = NSWindow(contentViewController: hostingController)
-        window.title = "SuperIsland Settings"
+        window.title = L("SuperIsland Settings")
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.setContentSize(NSSize(width: 960, height: 680))
         window.minSize = NSSize(width: 800, height: 560)

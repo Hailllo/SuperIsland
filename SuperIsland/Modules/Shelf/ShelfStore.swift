@@ -82,15 +82,15 @@ struct ShelfItem: Identifiable, Codable, Hashable {
         switch kind {
         case .file:
             guard let url = resolvedFileURL ?? path.map({ URL(fileURLWithPath: $0) }) else {
-                return "File"
+                return L("File")
             }
             if url.hasDirectoryPath {
-                return "Folder"
+                return L("Folder")
             }
             let ext = url.pathExtension.trimmingCharacters(in: .whitespacesAndNewlines)
             return ext.isEmpty ? "File" : ext.uppercased()
         case .link:
-            guard let url = resolvedURL else { return "Link" }
+            guard let url = resolvedURL else { return L("Link") }
             return url.host(percentEncoded: false) ?? "Link"
         case .text:
             let count = textValue?.count ?? 0

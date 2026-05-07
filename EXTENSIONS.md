@@ -1,25 +1,21 @@
-# SuperIsland Extensions
+# SuperIsland 扩展
 
-Full docs at [dynamicisland.app/docs](https://dynamicisland.app/docs)
-
----
-
-Extensions are JavaScript packages that run inside SuperIsland's sandboxed runtime. They can render UI in the compact pill, the expanded drawer, and the full detail panel — and run background logic to fetch or compute data.
+扩展是运行在 SuperIsland 沙盒运行时中的 JavaScript 包。扩展可以在紧凑胶囊、展开抽屉和全展开详情面板中渲染 UI，也可以运行后台逻辑来获取或计算数据。
 
 ---
 
-## Extension structure
+## 扩展结构
 
-```
+```text
 your-extension/
-├── manifest.json       # Required — metadata and capabilities
-├── index.js            # Required — extension logic
-├── settings.json       # Optional — settings schema
+├── manifest.json       # 必需：元数据和能力声明
+├── index.js            # 必需：扩展逻辑
+├── settings.json       # 可选：设置 schema
 └── assets/
-    └── icon.svg        # Optional — shown in the extensions list
+    └── icon.svg        # 可选：显示在扩展列表中的图标
 ```
 
-Drop your extension folder into `Extensions/` and it will be discovered automatically when you run the app.
+将扩展目录放入 `Extensions/`，运行应用时会被自动发现。
 
 ---
 
@@ -52,125 +48,88 @@ Drop your extension folder into `Extensions/` and it will be discovered automati
 }
 ```
 
-**Permissions**
+### Permissions
 
-| Permission | What it unlocks |
+| 权限 | 可用能力 |
 |---|---|
-| `storage` | `SuperIsland.store` key-value persistence |
-| `network` | `SuperIsland.http.fetch()` |
-| `media` | `SuperIsland.system.getNowPlaying()` |
-| `notifications` | Send macOS notifications |
+| `storage` | 使用 `SuperIsland.store` 做扩展级键值持久化 |
+| `network` | 使用 `SuperIsland.http.fetch()` 发起网络请求 |
+| `media` | 使用 `SuperIsland.system.getNowPlaying()` 读取当前播放信息 |
+| `notifications` | 发送 macOS 通知，并写入 SuperIsland 通知流 |
+| `usage` | 读取 Codex / Claude 本地使用量摘要 |
 
-**Capabilities**
+### Capabilities
 
-| Key | Description |
+| Key | 说明 |
 |---|---|
-| `compact` | Render in the pill (≈188×34 pt) |
-| `expanded` | Render in the drawer (360×80 pt) |
-| `fullExpanded` | Render in the detail panel (400×200 pt) |
-| `backgroundRefresh` | `onRefresh()` is called on the `refreshInterval` |
-| `settings` | `settings.json` is read and surfaced in Settings |
+| `compact` | 在紧凑胶囊中渲染，约 188×34 pt |
+| `expanded` | 在展开抽屉中渲染，约 360×80 pt |
+| `fullExpanded` | 在全展开详情面板中渲染，约 400×200 pt |
+| `minimalCompact` | 在带刘海 Mac 的紧凑布局中渲染左右两侧内容 |
+| `backgroundRefresh` | 按 `refreshInterval` 调用 `onRefresh()` |
+| `settings` | 读取 `settings.json`，并在设置页中展示 |
+| `notificationFeed` | 作为通知流扩展，不参与模块轮播 |
 
 ---
 
-## index.js — API reference
+## index.js API 简介
 
-The `SuperIsland` global is injected before your script runs.
+扩展脚本运行前，宿主会注入全局对象 `SuperIsland`。
 
 ```js
-// --- Rendering ---
+SuperIsland.registerModule({
+  compact: function() {
+    return View.hstack([
+      View.icon("bolt.fill", { color: "yellow" }),
+      View.text("Hello", { style: "body" })
+    ]);
+  },
 
-// Set compact view (shown in the pill)
-SuperIsland.island.setCompactView({
-  left:   { type: "text", value: "25:00" },
-  center: { type: "text", value: "Focus" },
-  right:  { type: "icon", name: "timer" }
-})
+  expanded: function() {
+    return View.text("Expanded view", { style: "title" });
+  },
 
-// Set expanded view (shown when island is tapped)
-SuperIsland.island.setExpandedView({
-  rows: [
-    { type: "text", value: "Session 3 of 4", style: "title" },
-    { type: "text", value: "25 minutes remaining", style: "subtitle" },
-    {
-      type: "buttons",
-      items: [
-        { label: "Pause",  action: "pause"  },
-        { label: "Skip",   action: "skip"   },
-        { label: "Reset",  action: "reset"  }
-      ]
-    }
-  ]
-})
+  onAction: function(actionID, value) {
+    console.log("Action:", actionID, value);
+  }
+});
+```
 
-// --- Lifecycle hooks ---
+### 生命周期
 
-function onInit() {
-  // Called once when the extension is loaded.
-  // Restore persisted state, start timers, etc.
-}
+- `onActivate()`：扩展 runtime 激活时调用。
+- `onDeactivate()`：扩展 runtime 销毁前调用。
+- `onRefresh()`：当 `backgroundRefresh` 为 `true` 时，按 `refreshInterval` 周期调用。
+- `onAction(actionID, value)`：用户点击按钮、切换开关或拖动控件时调用。
+- `onSettingsChanged(key, value)`：用户修改扩展设置时调用。
 
-function onRefresh() {
-  // Called every `refreshInterval` seconds (if backgroundRefresh: true).
-  // Fetch data, update views.
-}
+### 常用 API
 
-function onAction(action) {
-  // Called when the user taps a button in your expanded view.
-  // `action` is the string from the button's `action` field.
-  if (action === "pause") { /* … */ }
-}
+```js
+SuperIsland.store.set("key", "value");
+SuperIsland.store.get("key");
 
-function onSettingsChanged(key, value) {
-  // Called when the user changes a setting.
-}
-
-// Register your hooks:
-SuperIsland.extension.onInit(onInit)
-SuperIsland.extension.onRefresh(onRefresh)
-SuperIsland.extension.onAction(onAction)
-SuperIsland.extension.onSettingsChanged(onSettingsChanged)
-
-// --- Storage ---
-
-SuperIsland.store.set("key", "value")   // persist a value
-SuperIsland.store.get("key")             // retrieve it (returns null if not set)
-
-// --- Settings ---
-
-SuperIsland.settings.get("myKey")        // read a value from settings.json schema
-
-// --- Network ---
+SuperIsland.settings.get("myKey");
 
 SuperIsland.http.fetch("https://api.example.com/data")
   .then(function(response) {
-    var data = JSON.parse(response.body)
-    // update views with data
-  })
-
-// --- Notifications ---
+    var data = JSON.parse(response.body);
+  });
 
 SuperIsland.notifications.send({
   title: "Time's up",
   body: "Take a break."
-})
+});
 
-// --- System media (requires "media") ---
+var snapshot = SuperIsland.system.getNowPlaying();
 
-var snapshot = SuperIsland.system.getNowPlaying()
-if (snapshot) {
-  console.log(snapshot.title, snapshot.artist, snapshot.playbackState)
-}
-
-// --- Island control ---
-
-SuperIsland.island.activate()    // bring the island to the foreground
-SuperIsland.island.dismiss()     // collapse back to compact
+SuperIsland.island.activate();
+SuperIsland.island.dismiss();
 ```
 
 ---
 
-## Full example — stock price ticker
+## 完整示例：股票价格扩展
 
 ```js
 "use strict";
@@ -212,8 +171,8 @@ function render() {
 
   SuperIsland.island.setExpandedView({
     rows: [
-      { type: "text", value: symbol + "  " + price, style: "title"    },
-      { type: "text", value: "Change: " + change,   style: "subtitle" }
+      { type: "text", value: symbol + "  " + price, style: "title" },
+      { type: "text", value: "Change: " + change, style: "subtitle" }
     ]
   });
 }
@@ -223,7 +182,7 @@ SuperIsland.extension.onRefresh(onRefresh);
 SuperIsland.extension.onSettingsChanged(onSettingsChanged);
 ```
 
-**settings.json** for the above:
+对应的 `settings.json`：
 
 ```json
 {
@@ -246,21 +205,21 @@ SuperIsland.extension.onSettingsChanged(onSettingsChanged);
 
 ---
 
-## Settings schema field types
+## Settings schema 字段类型
 
-| type | Options |
+| type | 选项 |
 |---|---|
 | `text` | `key`, `label`, `placeholder`, `default` |
-| `toggle` | `key`, `label`, `default` (bool) |
+| `toggle` | `key`, `label`, `default`，布尔值 |
 | `slider` | `key`, `label`, `min`, `max`, `step`, `default` |
-| `picker` | `key`, `label`, `options` (array of `{label, value}`), `default` |
-| `button` | `key`, `label`, `action` (optional action id, defaults to `key`) |
+| `picker` | `key`, `label`, `options`，数组项为 `{label, value}`，以及 `default` |
+| `button` | `key`, `label`, `action`，`action` 可选，默认等于 `key` |
 
 ---
 
-## Tips
+## 建议
 
-- Keep your compact view minimal — the pill is small. One piece of key info per slot.
-- Persist any state you'd want restored across app restarts using `SuperIsland.store`.
-- Use `onRefresh` for polling. Avoid `setInterval` — the runtime controls scheduling.
-- Test with the app running in Xcode; extension console logs appear in the Xcode output.
+- 保持紧凑视图简洁，胶囊区域很小，每个位置只显示一个关键信息。
+- 需要跨应用重启保留的状态，请使用 `SuperIsland.store` 持久化。
+- 需要轮询数据时使用 `onRefresh`。避免直接使用 `setInterval`，调度应交给 runtime 控制。
+- 开发时在 Xcode 中运行应用，扩展的 console 日志会显示在 Xcode 输出中。

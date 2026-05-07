@@ -30,15 +30,15 @@ enum ModuleType: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .nowPlaying: return "Now Playing"
-        case .volumeHUD: return "Volume"
-        case .battery: return "Battery"
-        case .shelf: return "Shelf"
-        case .connectivity: return "Connectivity"
-        case .calendar: return "Calendar"
-        case .weather: return "Weather"
-        case .notifications: return "Notifications"
-        case .teleprompter: return "Teleprompter"
+        case .nowPlaying: return L("Now Playing")
+        case .volumeHUD: return L("Volume")
+        case .battery: return L("Battery")
+        case .shelf: return L("Shelf")
+        case .connectivity: return L("Connectivity")
+        case .calendar: return L("Calendar")
+        case .weather: return L("Weather")
+        case .notifications: return L("Notifications")
+        case .teleprompter: return L("Teleprompter")
         }
     }
 
@@ -67,10 +67,10 @@ enum NotchHapticIntensity: Int, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .off: return "Off"
-        case .subtle: return "Subtle"
-        case .medium: return "Medium"
-        case .strong: return "Strong"
+        case .off: return L("Off")
+        case .subtle: return L("Subtle")
+        case .medium: return L("Medium")
+        case .strong: return L("Strong")
         }
     }
 
@@ -210,7 +210,7 @@ enum FullExpandedTab: Hashable, Identifiable {
     var title: String {
         switch self {
         case .home:
-            return "Home"
+            return L("Home")
         case .module(let module):
             return module.displayName
         }
@@ -283,6 +283,7 @@ final class AppState: ObservableObject {
     @AppStorage("general.displayIdentifier") var displayIdentifier: String = ""
     /// Trackpad two-finger and drag swipes on the island surface (cycle modules, expand/dismiss).
     @AppStorage("general.islandSurfaceSwipeEnabled") var islandSurfaceSwipeEnabled = true
+    @AppStorage("general.language") var language: AppLanguage = .english
     @AppStorage("onboarding.completed") var onboardingCompleted = false
     @AppStorage("debug.alwaysShowOnboarding") var debugAlwaysShowOnboarding = false
 

@@ -35,7 +35,6 @@ struct IslandNotification: Identifiable {
 @MainActor
 final class NotificationManager: ObservableObject {
     private static let accessibilityPromptedDefaultsKey = "notifications.accessibilityPrompted"
-    private static let whatsappExtensionID = "superisland.whatsapp-web"
 
     private struct WhatsAppLogEvent {
         let eventID: String
@@ -151,14 +150,7 @@ final class NotificationManager: ObservableObject {
             previewText: extracted.body.isEmpty ? nil : extracted.body,
             avatarURL: extracted.avatarURL,
             timestamp: Date(),
-            tapAction: extracted.appName.localizedCaseInsensitiveContains("whatsapp")
-                ? whatsappTapAction(
-                    sourceID: sourceID,
-                    senderName: extracted.senderName ?? extracted.title,
-                    previewText: extracted.body,
-                    avatarURL: extracted.avatarURL
-                )
-                : nil
+            tapAction: nil
         )
 
         addNotification(notif)
@@ -272,7 +264,7 @@ final class NotificationManager: ObservableObject {
 
     private func prettifiedAppName(from rawValue: String) -> String {
         let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return "System" }
+        guard !trimmed.isEmpty else { return L("System") }
 
         if trimmed.localizedCaseInsensitiveContains("whatsapp") {
             return "WhatsApp"
@@ -435,12 +427,7 @@ final class NotificationManager: ObservableObject {
             previewText: previewText,
             avatarURL: event.avatarURL,
             timestamp: event.timestamp,
-            tapAction: whatsappTapAction(
-                sourceID: "whatsapp-log:\(event.eventID)",
-                senderName: senderName ?? title,
-                previewText: previewText,
-                avatarURL: event.avatarURL
-            )
+            tapAction: nil
         )
     }
 
@@ -1011,12 +998,7 @@ final class NotificationManager: ObservableObject {
 	                    previewText: previewText,
 	                    avatarURL: avatarURL,
 	                    timestamp: notification.date,
-	                    tapAction: whatsappTapAction(
-	                        sourceID: sourceID,
-	                        senderName: senderName ?? title,
-	                        previewText: previewText,
-	                        avatarURL: avatarURL
-	                    )
+	                    tapAction: nil
 	                )
 	            )
         }
@@ -1192,21 +1174,16 @@ final class NotificationManager: ObservableObject {
     ) -> IslandNotification {
         let preferred = preferredNotification(between: existing, and: incoming)
         let secondary = preferred.sourceID == existing.sourceID ? incoming : existing
-        let preserveExistingSourceID = existing.sourceID.hasPrefix("whatsapp-web:") && !incoming.sourceID.hasPrefix("whatsapp-web:")
         let mergedSourceID: String
 
-        if preserveExistingSourceID {
-            mergedSourceID = existing.sourceID
+        let preferredPriority = sourcePriority(for: preferred.sourceID)
+        let secondaryPriority = sourcePriority(for: secondary.sourceID)
+        if preferredPriority > secondaryPriority {
+            mergedSourceID = preferred.sourceID
+        } else if secondaryPriority > preferredPriority {
+            mergedSourceID = secondary.sourceID
         } else {
-            let preferredPriority = sourcePriority(for: preferred.sourceID)
-            let secondaryPriority = sourcePriority(for: secondary.sourceID)
-            if preferredPriority > secondaryPriority {
-                mergedSourceID = preferred.sourceID
-            } else if secondaryPriority > preferredPriority {
-                mergedSourceID = secondary.sourceID
-            } else {
-                mergedSourceID = preferred.sourceID
-            }
+            mergedSourceID = preferred.sourceID
         }
 
         return IslandNotification(
@@ -1247,70 +1224,6 @@ final class NotificationManager: ObservableObject {
             payload: payload,
             presentation: tapAction.presentation
         )
-    }
-
-    private func whatsappTapAction(
-        sourceID: String,
-        senderName: String?,
-        previewText: String?,
-        avatarURL: String?
-    ) -> NotificationTapAction? {
-        let normalizedSender = comparisonKey(senderName)
-        let normalizedPreview = comparisonKey(previewText)
-        let recentMessages = WhatsAppWebBridge.shared.recentMessages
-
-        let matchedMessage = recentMessages.first { message in
-            let messageSender = comparisonKey(message.sender)
-            let messagePreview = comparisonKey(message.preview)
-
-            if let normalizedSender, let normalizedPreview {
-                return messageSender == normalizedSender && messagePreview == normalizedPreview
-            }
-
-            if let normalizedSender {
-                return messageSender == normalizedSender
-            }
-
-            if let normalizedPreview {
-                return messagePreview == normalizedPreview
-            }
-
-            return false
-        }
-
-        guard let matchedMessage,
-              let replyTarget = cleanText(matchedMessage.replyTarget) else {
-            return nil
-        }
-
-        var payload: [String: String] = [
-            "messageID": matchedMessage.id,
-            "notificationSourceID": sourceID,
-            "recipient": replyTarget,
-            "sender": cleanText(senderName) ?? matchedMessage.sender,
-            "preview": cleanText(previewText) ?? matchedMessage.preview
-        ]
-
-        if let mediaPreviewURL = cleanText(matchedMessage.mediaPreviewURL) {
-            payload["mediaPreviewURL"] = mediaPreviewURL
-        }
-
-        if let avatarURL = cleanText(avatarURL) ?? cleanText(matchedMessage.avatarURL) {
-            payload["avatarURL"] = avatarURL
-        }
-
-        return NotificationTapAction(
-            extensionID: Self.whatsappExtensionID,
-            actionID: "open-reply",
-            payload: payload,
-            presentation: .fullExpanded
-        )
-    }
-
-    private func comparisonKey(_ value: String?) -> String? {
-        cleanText(value)?
-            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func duplicateNotificationIndex(for incoming: IslandNotification) -> Int? {
@@ -1490,9 +1403,6 @@ final class NotificationManager: ObservableObject {
     }
 
     private func sourcePriority(for sourceID: String) -> Int {
-        if sourceID.hasPrefix("whatsapp-web:") {
-            return 6
-        }
         if sourceID.hasPrefix("extension:") {
             return 5
         }

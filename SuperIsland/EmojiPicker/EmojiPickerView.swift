@@ -94,11 +94,11 @@ struct EmojiPickerView: View {
 
     private var emptyState: some View {
         VStack(spacing: 6) {
-            Text("No emoji found")
+            Text(L("No emoji found"))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.82))
 
-            Text("Keep typing to refine the search")
+            Text(L("Keep typing to refine the search"))
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(.white.opacity(0.4))
         }

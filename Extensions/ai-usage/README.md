@@ -1,35 +1,34 @@
-# AI Usage Rings Extension
+# AI 使用量圆环扩展
 
-Displays Codex + Claude usage/availability inside SuperIsland with circular indicators.
+在 SuperIsland 中用圆形指示器显示 Codex 和 Claude 的使用量 / 可用性。
 
-## Colors
+## 颜色含义
 
-- Green: healthy/available
-- Orange: low
-- Red: very low / blocked
+- 绿色：状态健康 / 可用
+- 橙色：额度偏低
+- 红色：额度很低 / 受限
 
-## Permissions
+## 权限
 
-- `usage` (required for `SuperIsland.system.getAIUsage()`)
+- `usage`：必需，用于调用 `SuperIsland.system.getAIUsage()`
 
-## Data Sources
+## 数据来源
 
-- Codex:
-  - `~/.codex/usage-summary.json` or `~/.codex/usage/summary.json`
-  - fallback: ChatGPT OAuth usage API (`https://chatgpt.com/backend-api/wham/usage`) using token from `~/.codex/auth.json`
-- Claude:
-  - `~/.claude/usage-summary.json` or `~/.config/claude/usage-summary.json`
-  - fallback: Anthropic OAuth usage API (`https://api.anthropic.com/api/oauth/usage`) using token from:
+- Codex：
+  - `~/.codex/usage-summary.json` 或 `~/.codex/usage/summary.json`
+  - fallback：使用 `~/.codex/auth.json` 中的 token 调用 ChatGPT OAuth 使用量 API：`https://chatgpt.com/backend-api/wham/usage`
+- Claude：
+  - `~/.claude/usage-summary.json` 或 `~/.config/claude/usage-summary.json`
+  - fallback：使用以下位置的 token 调用 Anthropic OAuth 使用量 API：`https://api.anthropic.com/api/oauth/usage`
     - `~/.claude/.credentials.json` / `~/.claude/credentials.json`
-    - macOS keychain service `Claude Code-credentials`
-  - last fallback: `~/.claude/stats-cache.json`
-- SuperIsland first checks the Claude keychain item without showing UI. If macOS
-  requires a password prompt, SuperIsland only asks once and then falls back to
-  local Claude usage/cache data unless the keychain item can be read silently.
+    - macOS Keychain service：`Claude Code-credentials`
+  - 最后 fallback：`~/.claude/stats-cache.json`
 
-## Refresh Behavior
+SuperIsland 会先尝试静默读取 Claude Keychain 项。如果 macOS 需要弹出密码提示，SuperIsland 只会询问一次；如果无法静默读取，则回退到本地 Claude 使用量 / 缓存数据。
 
-- The native usage provider cache refreshes every 5 minutes.
-- Codex still updates from local summary / OAuth API data.
-- Claude reads session (`five_hour`) and weekly (`seven_day*`) windows from OAuth usage when available.
-- Week/session values no longer mirror overall remaining when source data is missing (they show `--%`).
+## 刷新行为
+
+- 原生 usage provider 缓存每 5 分钟刷新一次。
+- Codex 仍会从本地 summary 或 OAuth API 数据更新。
+- Claude 会在可用时从 OAuth usage 中读取 session（`five_hour`）和 weekly（`seven_day*`）窗口。
+- 当源数据缺失时，周 / 会话值不再镜像 overall remaining，而是显示 `--%`。

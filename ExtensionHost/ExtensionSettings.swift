@@ -307,7 +307,7 @@ struct ExtensionSettingsRenderer: View {
             }
 
         default:
-            Text("Unsupported setting field: \(field.type)")
+            Text(L("Unsupported setting field: %@", field.type))
                 .font(.caption)
                 .foregroundColor(.secondary)
         }

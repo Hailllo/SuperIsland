@@ -22,8 +22,8 @@ struct AppearanceSettingsView: View {
             ) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Bounce").font(.system(size: 13))
-                        Text("Spring bounce for compact ↔ expanded transitions")
+                        Text(L("Bounce")).font(.system(size: 13))
+                        Text(L("Spring bounce for compact ↔ expanded transitions"))
                             .font(.system(size: 11)).foregroundColor(.secondary)
                     }
                     Spacer(minLength: 12)
@@ -73,7 +73,7 @@ struct AppearanceSettingsView: View {
     ) -> some View {
         HStack(alignment: .firstTextBaseline) {
             SettingSectionLabel(title: title)
-            Button("Reset", action: reset)
+            Button(L("Reset"), action: reset)
                 .buttonStyle(.plain)
                 .font(.system(size: 11))
                 .foregroundColor(.accentColor)
@@ -93,8 +93,8 @@ struct AppearanceSettingsView: View {
     ) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 13))
-                Text(description)
+                Text(L(title)).font(.system(size: 13))
+                Text(L(description))
                     .font(.system(size: 11)).foregroundColor(.secondary)
             }
             Spacer(minLength: 12)

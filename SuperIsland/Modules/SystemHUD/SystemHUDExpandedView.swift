@@ -64,7 +64,7 @@ struct SystemHUDExpandedView: View {
 
                 VStack(alignment: .leading, spacing: 5) {
                     HStack {
-                        Text("System Volume")
+                        Text(L("System Volume"))
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundColor(.white)
                         Spacer()
@@ -84,12 +84,12 @@ struct SystemHUDExpandedView: View {
             Divider()
                 .overlay(.white.opacity(0.15))
 
-            Text("Media Apps")
+            Text(L("Media Apps"))
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(.white.opacity(0.8))
 
             if volumeManager.mediaAppVolumes.isEmpty {
-                Text("No supported media apps are currently playing.")
+                Text(L("No supported media apps are currently playing."))
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.5))
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -121,7 +121,7 @@ struct SystemHUDExpandedView: View {
 
     private var label: String {
         switch appState.activeBuiltInModule {
-        case .volumeHUD: return "Volume"
+        case .volumeHUD: return L("Volume")
         default: return ""
         }
     }

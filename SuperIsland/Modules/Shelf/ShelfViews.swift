@@ -17,7 +17,7 @@ struct ShelfCompactView: View {
                     .foregroundStyle(.white)
                     .lineLimit(1)
             } else {
-                Text("Shelf")
+                Text(L("Shelf"))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.72))
             }
@@ -47,7 +47,7 @@ struct ShelfExpandedView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                Label("Shelf", systemImage: "tray.full.fill")
+                Label(L("Shelf"), systemImage: "tray.full.fill")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.white)
 
@@ -63,10 +63,10 @@ struct ShelfExpandedView: View {
                         .foregroundStyle(.white.opacity(0.78))
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Drop onto the island")
+                        Text(L("Drop onto the island"))
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(.white)
-                        Text("Items stay pinned here until you remove them.")
+                        Text(L("Items stay pinned here until you remove them."))
                             .font(.system(size: 11))
                             .foregroundStyle(.white.opacity(0.56))
                     }
@@ -128,11 +128,11 @@ private struct AirDropDropPane: View {
                             .foregroundStyle(.white.opacity(isTargeted ? 0.96 : 0.84))
                     }
 
-                Text("AirDrop")
+                Text(L("AirDrop"))
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.white)
 
-                Text("Drop to share")
+                Text(L("Drop to share"))
                     .font(.system(size: 9, weight: .medium))
                     .foregroundStyle(.white.opacity(0.46))
             }
@@ -186,7 +186,7 @@ private struct TrayDropPane: View {
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.82))
 
-                    Text("Drop files here")
+                    Text(L("Drop files here"))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.78))
                 }
@@ -194,13 +194,13 @@ private struct TrayDropPane: View {
             } else {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
-                        Text("Tray")
+                        Text(L("Tray"))
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(.white.opacity(0.72))
 
                         Spacer(minLength: 8)
 
-                        Button("Clear") {
+                        Button(L("Clear")) {
                             shelf.clear()
                         }
                         .buttonStyle(.plain)
@@ -361,12 +361,12 @@ private struct TrayItemTile: View {
             shelf.dragProvider(for: item)
         }
         .contextMenu {
-            Button("Open") {
+            Button(L("Open")) {
                 shelf.open(item)
             }
 
             if item.kind == .file {
-                Button("Show in Finder") {
+                Button(L("Show in Finder")) {
                     shelf.reveal(item)
                 }
             }
@@ -375,13 +375,13 @@ private struct TrayItemTile: View {
                 shelf.copy(item)
             }
 
-            Button("Share via AirDrop") {
+            Button(L("Share via AirDrop")) {
                 shelf.shareViaAirDrop(items: [item])
             }
 
             Divider()
 
-            Button("Remove") {
+            Button(L("Remove")) {
                 shelf.remove(item)
             }
         }

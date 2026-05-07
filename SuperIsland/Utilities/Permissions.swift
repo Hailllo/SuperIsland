@@ -17,25 +17,25 @@ enum PermissionType: CaseIterable {
 
     var title: String {
         switch self {
-        case .accessibility: return "Accessibility"
-        case .screenRecording: return "Screen Recording"
-        case .calendar: return "Calendar"
-        case .notifications: return "Notifications"
-        case .microphone: return "Microphone"
-        case .location: return "Location"
-        case .bluetooth: return "Bluetooth"
+        case .accessibility: return L("Accessibility")
+        case .screenRecording: return L("Screen Recording")
+        case .calendar: return L("Calendar")
+        case .notifications: return L("Notifications")
+        case .microphone: return L("Microphone")
+        case .location: return L("Location")
+        case .bluetooth: return L("Bluetooth")
         }
     }
 
     var description: String {
         switch self {
-        case .accessibility: return "Needed for gesture detection and system event monitoring"
-        case .screenRecording: return "Lets SuperIsland appear properly in screen recordings"
-        case .calendar: return "Show upcoming events in the Super Island"
-        case .notifications: return "Mirror notifications in the Super Island"
-        case .microphone: return "Audio visualization for the spectrogram"
-        case .location: return "Provide weather information for your location"
-        case .bluetooth: return "Show connected device notifications"
+        case .accessibility: return L("Needed for gesture detection and system event monitoring")
+        case .screenRecording: return L("Lets SuperIsland appear properly in screen recordings")
+        case .calendar: return L("Show upcoming events in the Super Island")
+        case .notifications: return L("Mirror notifications in the Super Island")
+        case .microphone: return L("Audio visualization for the spectrogram")
+        case .location: return L("Provide weather information for your location")
+        case .bluetooth: return L("Connected device notifications")
         }
     }
 

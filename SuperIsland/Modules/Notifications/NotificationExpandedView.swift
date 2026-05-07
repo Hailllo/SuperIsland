@@ -35,12 +35,12 @@ struct NotificationExpandedView: View {
                 .font(.system(size: 18))
                 .foregroundColor(.white.opacity(0.4))
 
-            Text("No Notifications")
+            Text(L("No Notifications"))
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.white.opacity(0.5))
 
             if appState.currentState == .fullExpanded {
-                Text("Notifications from apps will appear here")
+                Text(L("Notifications from apps will appear here"))
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.3))
             }
@@ -113,14 +113,14 @@ struct NotificationExpandedView: View {
 
     private var footerBar: some View {
         HStack(spacing: 6) {
-            Text("\(manager.recentNotifications.count) notification\(manager.recentNotifications.count == 1 ? "" : "s")")
+            Text(L(manager.recentNotifications.count == 1 ? "%d notification" : "%d notifications", manager.recentNotifications.count))
                 .font(.system(size: 9, weight: .medium))
                 .foregroundColor(.white.opacity(0.34))
 
             Spacer(minLength: 0)
 
             Button(action: { manager.clearAll() }) {
-                Text("Clear All")
+                Text(L("Clear All"))
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(.white.opacity(0.58))
             }

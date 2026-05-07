@@ -221,7 +221,7 @@ private struct HomeCalendarPanel: View {
 
     private var todaySubtitle: String {
         if upcomingEvents.isEmpty {
-            return "No events scheduled today"
+            return L("No events scheduled today")
         }
         if upcomingEvents.count == 1 {
             return "1 event coming up"

@@ -1,7 +1,8 @@
-### Things to do and fix
-- [x] Right now the battery trend is being calculated by us, use the systems already available data for battery trend
-- [x] (Bug) when we open the emoji the dynamic island shrinks as it's not in focus, if we have opened the emoji from the dynamic island, don't close the dynamic island
-- [x] Put the battery on the top right, before the notifaction icon and don't show it as a space when we use left and right arrows only when click on it on the top right
-- Show only current date and upcoming events as compacted, we need to make space for third item on the home. it will be a weather
-- We need to allow user to customise the home screen, two other items from the settings
-- Add a tray icon on the top left for dragging files into airdrop or just a space to keep there
+# 待办与修复项
+
+- [x] 电池趋势目前由应用自行计算，改为使用系统已有的电池趋势数据。
+- [x] 修复：打开 emoji 面板时，Dynamic Island 因失去焦点而收缩。如果 emoji 是从岛内打开的，不应关闭岛。
+- [x] 将电池放在右上角、通知图标之前；左右箭头切换模块时不要把电池作为一个占位模块展示，只在点击右上角电池时显示。
+- [ ] 紧凑状态只显示当前日期和即将到来的日程，为首页第三个项目预留空间，第三项将用于天气。
+- [ ] 允许用户在设置中自定义首页上的另外两个项目。
+- [ ] 在左上角添加托盘图标，用于拖拽文件到 AirDrop，或作为临时存放空间。

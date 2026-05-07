@@ -1,127 +1,142 @@
-# Onboarding Screen — Complete Redesign Prompt
+# Onboarding 页面完整重设计提示词
 
-## Overview
+## 概览
 
-Rebuild the entire onboarding flow for **SuperIsland** (macOS SwiftUI app). The onboarding is a **standalone window** — not a native macOS-feeling window. Think of it as a **compact, floating A4-ish black card** centered on screen. No title bar chrome. No toolbar. Just a clean, dark, self-contained panel with rounded corners and zero native window decorations visible.
+重建 **SuperIsland**（macOS SwiftUI 应用）的完整 onboarding 流程。onboarding 是一个**独立窗口**，不需要像原生 macOS 窗口。它应该像一个居中的、紧凑的、悬浮的黑色 A4 风格卡片。不要标题栏 chrome，不要工具栏，只保留一个干净、深色、自包含、圆角的面板，不显示任何原生窗口装饰。
 
-The window should be approximately **840×620 points**, with `titlebarAppearsTransparent = true`, `titleVisibility = .hidden`, `.fullSizeContentView` style mask, `isOpaque = false`, `backgroundColor = .clear`. The content fills edge to edge. The overall shape is a large **continuous rounded rectangle (cornerRadius ~28)** clipped to the window bounds, so it reads like a floating dark card on the desktop.
-
----
-
-## Global Design Language
-
-### Color Palette (Dark Theme)
-- **Background base**: Rich black `#0A0A0E` to deep charcoal `#111117` gradient — NOT pure `#000000`. Slightly warm-cool undertone.
-- **Text primary**: `rgba(255, 255, 255, 0.94)` — near-white, not harsh pure white.
-- **Text secondary**: `rgba(255, 255, 255, 0.62)` — muted descriptions.
-- **Text tertiary**: `rgba(255, 255, 255, 0.38)` — hints, footnotes.
-- **Accent — cool**: Soft periwinkle blue `#7DB4FF` → deeper `#4A87F5`.
-- **Accent — warm**: Amber-gold `#F5A84B` → burnt orange `#E07832`.
-- **Success green**: `#34D399` at 90% opacity.
-- **Card surfaces**: `rgba(255, 255, 255, 0.05)` fill with `rgba(255, 255, 255, 0.08)` 1px border stroke.
-- **Borders on interactive elements**: `rgba(255, 255, 255, 0.12)`.
-
-### Background — Liquid Glass Purple Animated Gradient
-Behind ALL content on every page, render a **subtle animated gradient layer** using blurred circles that drift slowly:
-
-1. **Purple orb** — `#8B5CF6` at 18% opacity, ~380pt diameter, blurred at radius 50. Drifts diagonally top-left ↔ center-left over 10s `easeInOut` repeating forever with autoreversal.
-2. **Indigo orb** — `#6366F1` at 14% opacity, ~300pt diameter, blurred at radius 44. Drifts from center-right ↔ bottom-right over 12s.
-3. **Violet-pink orb** — `#A78BFA` at 10% opacity, ~260pt diameter, blurred at radius 38. Floats near bottom-center ↔ center over 14s.
-
-These orbs sit **behind** a semi-opaque black gradient overlay (`#0A0A0E` at 85% opacity → `#111117` at 70% opacity, top-leading to bottom-trailing) so text remains perfectly legible. The gradient animation should feel like gentle, living aurora borealis behind dark glass — visible but never competing with text.
-
-**Critical**: The gradient must NOT overlap or wash out any text or UI elements. It is atmospheric only.
-
-### Typography
-- Use `.system` font throughout (San Francisco via SwiftUI).
-- Hero titles: **size 44–48, weight .bold** (for the Hello effect) or **size 36, weight .semibold** for section headers.
-- Body text: **size 16–17, weight .regular**.
-- Captions / chip labels: **size 12–13, weight .semibold**.
-- All text centered unless in a card layout (then left-aligned).
-
-### Page Indicator
-A horizontal row of **3 capsule dots** at the top-right of the window:
-- Active page: elongated capsule (width 28, height 8), white at 85%.
-- Inactive pages: circle (width 8, height 8), white at 18%.
-- Animate width change with `.spring(response: 0.34, dampingFraction: 0.82)`.
-- Wrap in a pill-shaped container with `rgba(255,255,255, 0.06)` fill and `rgba(255,255,255, 0.12)` 1px border.
-
-### Page Transitions
-All page transitions use `.asymmetric`:
-- Insertion: `.move(edge: .trailing).combined(with: .opacity)`
-- Removal: `.move(edge: .leading).combined(with: .opacity)`
-- With `.spring(response: 0.38, dampingFraction: 0.9)`.
+窗口尺寸约为 **840×620 points**，使用 `titlebarAppearsTransparent = true`、`titleVisibility = .hidden`、`.fullSizeContentView` style mask、`isOpaque = false`、`backgroundColor = .clear`。内容铺满窗口。整体形状是一个大的 **continuous rounded rectangle**，圆角约 28，并裁剪到窗口边界，使其看起来像桌面上的深色悬浮卡片。
 
 ---
 
-## Page 1 — Welcome (Apple "Hello" Effect)
+## 全局设计语言
 
-### Layout (top to bottom, centered)
+### 色彩方案（深色主题）
 
-#### 1. Hero "Hello" Text — Apple Boot Screen Effect
-Recreate the iconic Apple "Hello" animation:
-- The word **"Hello."** rendered in a large, elegant cursive/script style. Since SwiftUI doesn't ship with the exact Apple "Hello" font, approximate it:
-  - Use a **custom handwriting-style feel** by rendering the text with `.font(.system(size: 72, weight: .thin, design: .serif))` or, ideally, use a custom font asset if available (e.g., a lightweight script font).
-  - Alternatively, use the word in a **very large, thin-weight San Francisco** (size 64, `.ultraLight`) with letter spacing, giving it an elegant minimal feel — not cursive but Apple-keynote-clean.
-- **Animation**: The text appears via a **gradient mask wipe** — a horizontal `LinearGradient` (from leading transparent to trailing opaque) that animates its start/end points from left to right over ~1.8 seconds with `easeInOut`, progressively revealing the text as if being written. This is the signature Apple Hello reveal.
-- **Color**: The "Hello" text should use an **animated gradient fill** that shifts colors slowly:
-  - Cycle through: soft purple `#A78BFA` → blue `#60A5FA` → teal `#2DD4BF` → pink `#F472B6` → back to purple.
-  - Use an `AngularGradient` or `LinearGradient` with animated `startPoint`/`endPoint` shifting over 6 seconds, repeating.
-  - Apply as `.foregroundStyle()` using the gradient, so the text itself shimmers with living color.
+- **背景底色**：从浓黑 `#0A0A0E` 到深炭灰 `#111117` 的渐变，不要使用纯 `#000000`，需要轻微冷暖底色。
+- **主文本**：`rgba(255, 255, 255, 0.94)`，接近白色，但不要刺眼。
+- **次级文本**：`rgba(255, 255, 255, 0.62)`，用于描述。
+- **三级文本**：`rgba(255, 255, 255, 0.38)`，用于提示和脚注。
+- **冷色强调色**：柔和浅紫蓝 `#7DB4FF` 到深蓝 `#4A87F5`。
+- **暖色强调色**：琥珀金 `#F5A84B` 到焦橙 `#E07832`。
+- **成功绿色**：`#34D399`，90% 不透明度。
+- **卡片表面**：`rgba(255, 255, 255, 0.05)` 填充，`rgba(255, 255, 255, 0.08)` 1px 边框。
+- **交互元素边框**：`rgba(255, 255, 255, 0.12)`。
 
-#### 2. Subtitle
-Below the Hello text (after a 20pt spacer):
-- **"Welcome to SuperIsland"** — size 22, weight .semibold, text primary color.
-- Below that (8pt gap): **"Your Mac's notch, reimagined."** — size 16, weight .regular, text secondary color.
+### 背景：Liquid Glass 紫色动态渐变
 
-#### 3. Feature Chips
-A horizontal `HStack` of 3 small pill badges:
-- "Calm by default" · "Notch-native" · "Made for macOS"
-- Each chip: size 12 semibold, text tertiary, inside a capsule with `rgba(255,255,255, 0.05)` fill and `rgba(255,255,255, 0.10)` 1px border.
-- Separated by 8pt spacing inside the HStack.
+所有页面内容背后都渲染一个微妙的动态渐变层，使用缓慢漂移的模糊圆形：
 
-#### 4. Continue Button (bottom)
-- "Continue" button using the accent cool gradient fill (`#7DB4FF` → `#4A87F5`).
-- Pill shape, 46pt tall, horizontal padding 24.
-- White text, size 15 semibold.
-- On hover: scale 1.04, shadow intensifies (glow effect using cool accent at 28% opacity, radius 18).
-- Spring animation on hover `.spring(response: 0.32, dampingFraction: 0.78)`.
+1. **紫色光球**：`#8B5CF6`，18% 不透明度，直径约 380pt，blur 半径 50。以 10 秒 `easeInOut` 在左上与中左之间对角漂移，永久往返。
+2. **靛蓝光球**：`#6366F1`，14% 不透明度，直径约 300pt，blur 半径 44。从中右到右下漂移，周期 12 秒。
+3. **紫粉光球**：`#A78BFA`，10% 不透明度，直径约 260pt，blur 半径 38。在底部中央与中心附近漂浮，周期 14 秒。
+
+这些光球位于半透明黑色渐变覆盖层之后：`#0A0A0E` 85% 到 `#111117` 70%，从左上到右下，以确保文字始终清晰可读。动画感觉应像深色玻璃背后轻微流动的极光，可见但不能抢夺注意力。
+
+**关键要求**：渐变不能冲淡或覆盖任何文本和 UI 元素，只作为氛围背景。
+
+### 字体
+
+- 全部使用 `.system` 字体，即 San Francisco。
+- Hero 标题：大小 44–48，weight `.bold`；Hello 效果可用。分区标题大小 36，weight `.semibold`。
+- 正文：大小 16–17，weight `.regular`。
+- Caption / chip 文本：大小 12–13，weight `.semibold`。
+- 除卡片布局外，文本默认居中；卡片内左对齐。
+
+### 页面指示器
+
+窗口右上角放一排 **3 个胶囊点**：
+
+- 当前页面：长胶囊，宽 28、高 8，白色 85%。
+- 非当前页面：圆点，宽高 8，白色 18%。
+- 使用 `.spring(response: 0.34, dampingFraction: 0.82)` 动画宽度变化。
+- 外层放在一个胶囊容器中，填充 `rgba(255,255,255, 0.06)`，边框 `rgba(255,255,255, 0.12)` 1px。
+
+### 页面转场
+
+所有页面转场使用 `.asymmetric`：
+
+- 插入：`.move(edge: .trailing).combined(with: .opacity)`
+- 移除：`.move(edge: .leading).combined(with: .opacity)`
+- 动画：`.spring(response: 0.38, dampingFraction: 0.9)`
 
 ---
 
-## Page 2 — Permissions
+## 第 1 页：欢迎页（Apple “Hello” 效果）
 
-### Layout (top to bottom)
+### 布局（自上而下，居中）
 
-#### 1. Section Header
-- **"Let's set things up"** — size 34, weight .semibold, text primary. Centered.
-- Below (8pt): **"Grant a few permissions so everything works smoothly."** — size 16, weight .regular, text secondary. Centered.
+#### 1. Hero “Hello” 文本
 
-#### 2. Permission Cards — Scrollable List
-A `VStack(spacing: 14)` of permission cards. Each card uses the **liquid glass icon style** inspired by the reference images — icons with iridescent gradient fills inside rounded-rectangle containers.
+重现 Apple 标志性的 “Hello” 动画：
 
-**Required permissions** (blocking — must be granted to continue):
+- 用大号优雅手写 / 脚本风格渲染 **“Hello.”**。SwiftUI 没有完全一致的 Apple Hello 字体，可以用以下方式近似：
+  - 使用 `.font(.system(size: 72, weight: .thin, design: .serif))` 营造手写感。
+  - 或使用自定义轻量 script 字体。
+  - 也可使用大号、极细 San Francisco（size 64，`.ultraLight`）并加字距，呈现 Apple keynote 风格。
+- **动画**：使用水平 `LinearGradient` mask 从左到右擦除显示，约 1.8 秒 `easeInOut`，让文字像被写出来一样逐步出现。
+- **颜色**：文字本身使用缓慢变化的渐变填充：
+  - 柔紫 `#A78BFA` → 蓝 `#60A5FA` → 青 `#2DD4BF` → 粉 `#F472B6` → 回到紫色。
+  - 可使用 `AngularGradient` 或 `LinearGradient`，并在 6 秒内循环移动 startPoint / endPoint。
 
-| Permission | SF Symbol | Description |
+#### 2. 副标题
+
+Hello 文本下方 20pt 间距：
+
+- **“Welcome to SuperIsland”**：大小 22，weight `.semibold`，主文本色。
+- 下方 8pt：**“Your Mac's notch, reimagined.”**：大小 16，weight `.regular`，次级文本色。
+
+#### 3. 功能标签
+
+一排 3 个小胶囊标签：
+
+- “Calm by default” · “Notch-native” · “Made for macOS”
+- 每个 chip：大小 12，semibold，三级文本色，胶囊填充 `rgba(255,255,255, 0.05)`，边框 `rgba(255,255,255, 0.10)` 1px。
+- HStack 间距 8pt。
+
+#### 4. Continue 按钮
+
+- 文案：“Continue”。
+- 使用冷色强调渐变 `#7DB4FF` → `#4A87F5`。
+- 胶囊形状，高 46pt，水平 padding 24。
+- 白色文本，大小 15，semibold。
+- Hover：scale 1.04，阴影增强，使用冷色强调 28% 不透明度、radius 18 的 glow。
+- Hover 动画：`.spring(response: 0.32, dampingFraction: 0.78)`。
+
+---
+
+## 第 2 页：权限
+
+### 布局
+
+#### 1. 标题
+
+- **“Let's set things up”**：大小 34，weight `.semibold`，主文本色，居中。
+- 下方 8pt：**“Grant a few permissions so everything works smoothly.”**：大小 16，次级文本色，居中。
+
+#### 2. 权限卡片列表
+
+使用 `VStack(spacing: 14)` 展示权限卡片。每张卡片采用参考图中的 liquid glass 图标风格：图标在圆角矩形容器中，带虹彩渐变填充。
+
+必需权限：
+
+| 权限 | SF Symbol | 描述 |
 |---|---|---|
-| **Screen Recording** | `display` | "Lets SuperIsland detect your active workspace and render over the notch." |
-| **Accessibility** | `figure.stand` | "Required for gesture detection, window interaction, and productivity overlays." |
+| **Screen Recording** | `display` | “Lets SuperIsland detect your active workspace and render over the notch.” |
+| **Accessibility** | `figure.stand` | “Required for gesture detection, window interaction, and productivity overlays.” |
 
-**Optional permissions** (can be skipped):
+可选权限：
 
-| Permission | SF Symbol | Description |
+| 权限 | SF Symbol | 描述 |
 |---|---|---|
-| **Calendar** | `calendar` | "Show upcoming events right in the island." |
-| **Notifications** | `bell.badge` | "Mirror system notifications in the Super Island." |
-| **Microphone** | `mic.fill` | "Powers the audio spectrogram visualizer." |
-| **Location** | `location.fill` | "Displays local weather information." |
-| **Bluetooth** | `wave.3.right` | "Shows connected device status." |
+| **Calendar** | `calendar` | “Show upcoming events right in the island.” |
+| **Notifications** | `bell.badge` | “Mirror system notifications in the Super Island.” |
+| **Microphone** | `mic.fill` | “Powers the audio spectrogram visualizer.” |
+| **Location** | `location.fill` | “Displays local weather information.” |
+| **Bluetooth** | `wave.3.right` | “Shows connected device status.” |
 
-#### 3. Each Permission Card Design
+#### 3. 权限卡片设计
 
-Inspired by the reference images — each card is a horizontal row inside a rounded rect:
-
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │  ┌─────────┐                                                    │
 │  │  icon   │  Title                          [Grant Access]     │
@@ -130,82 +145,82 @@ Inspired by the reference images — each card is a horizontal row inside a roun
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-- **Card background**: `rgba(255,255,255, 0.05)` fill, `rgba(255,255,255, 0.08)` 1px continuous rounded rect border, cornerRadius 22.
-- **Padding**: 20pt all sides.
-- **Icon container**: 54×54 rounded rect (cornerRadius 16, continuous), filled with a **liquid glass gradient** — an `AngularGradient` or `LinearGradient` using iridescent colors:
-  - For required permissions: purple `#8B5CF6` → blue `#3B82F6` → gold `#F59E0B` with a slight noise texture feel (achieve with overlapping semi-transparent radial gradients).
-  - For optional permissions: subtler version — dark surface `rgba(255,255,255, 0.08)` with a faint iridescent border shimmer.
-  - The SF Symbol icon sits centered inside in white at 92% opacity, size 22 semibold.
-  - When granted: the icon container gets a subtle green tint overlay.
-- **Title**: size 17, weight .semibold, text primary. Left-aligned.
-- **Description**: size 13, weight .regular, text secondary. Left-aligned, below title with 4pt gap.
-- **Action button** (right side):
-  - Not granted: "Grant Access" secondary pill button (rgba(255,255,255, 0.10) fill, white text at 88%).
-  - Granted: Green checkmark badge — `checkmark.circle.fill` icon + "Granted" text in `#34D399`, inside a capsule with green at 12% fill. Animate in with `.spring(response: 0.34, dampingFraction: 0.72)` scale from 0.75 → 1.0.
-- **Hover effect**: card lifts 2pt (offset y: -2), shadow deepens. Spring animated.
-- **Stagger reveal**: Cards appear one by one with 100ms delay between each, sliding up from 18pt below with opacity 0 → 1. Use `.spring(response: 0.42, dampingFraction: 0.88)`.
+- **卡片背景**：`rgba(255,255,255, 0.05)` 填充，`rgba(255,255,255, 0.08)` 1px continuous rounded rect 边框，cornerRadius 22。
+- **Padding**：20pt。
+- **图标容器**：54×54，圆角矩形，cornerRadius 16，continuous。
+- 必需权限图标容器：紫 `#8B5CF6` → 蓝 `#3B82F6` → 金 `#F59E0B` 的 liquid glass 渐变。
+- 可选权限图标容器：更弱的深色表面，加微弱虹彩边框。
+- 图标居中，白色 92%，size 22 semibold。
+- 授权后：图标容器增加微弱绿色 tint。
+- 标题：size 17，weight `.semibold`，主文本色。
+- 描述：size 13，weight `.regular`，次级文本色。
+- 右侧按钮：未授权显示 “Grant Access”，已授权显示绿色 check badge。
+- Hover：卡片上移 2pt，阴影增强。
+- 出现动画：卡片逐个出现，每张延迟 100ms，从下方 18pt + opacity 0 进入。
 
-#### 4. Divider between Required and Optional
-A subtle horizontal line or label:
-- Small text "Optional — you can enable these later" in text tertiary, centered, with thin `rgba(255,255,255, 0.06)` lines on either side (a divider pattern).
+#### 4. Required / Optional 分割
 
-#### 5. Continue Button (bottom)
-- Same cool accent button as Page 1.
-- **Disabled** (opacity 0.48, no hover effect) until BOTH required permissions (Screen Recording + Accessibility) are granted.
-- Below the button when disabled: "Enable required permissions above to continue." — size 13, text tertiary.
-- Poll permission state every 800ms using a `.task` loop with `PermissionsManager.shared` checks.
+使用微妙的横线或文本：
 
-#### 6. Permission Check Badge (top-right of icon, like reference images)
-When a permission is granted, show a small **leaf/petal-shaped badge** at the top-right corner of the icon container (inspired by the golden-purple checkmark badge in the reference images):
-- Shape: a small rounded teardrop/leaf, ~22×22.
-- Fill: `AngularGradient` with gold `#F5A84B` → purple `#8B5CF6` → blue `#3B82F6`.
-- Contains a small white checkmark `checkmark` at size 10, weight .bold.
-- Animate in with scale + opacity spring.
+- “Optional — you can enable these later”
+- 三级文本色，左右用细线分隔。
+
+#### 5. Continue 按钮
+
+- 与第 1 页相同冷色按钮。
+- 在两个必需权限都授权之前禁用。
+- 禁用时透明度 0.48，不响应 hover。
+- 按钮下方显示：“Enable required permissions above to continue.”。
+- 使用 `.task` 每 800ms 轮询 `PermissionsManager.shared`。
 
 ---
 
-## Page 3 — Gestures Tutorial & Done
+## 第 3 页：手势教程与完成
 
-### Layout (top to bottom)
+### 布局
 
-#### 1. Section Header
-- **"How to use SuperIsland"** — size 34, weight .semibold, text primary. Centered.
-- Below: **"A few quick gestures and you're ready."** — size 16, text secondary. Centered.
+#### 1. 标题
 
-#### 2. Gesture Instruction Cards
-A centered grid or vertical stack of **3 gesture cards** showing how to interact with the island:
+- **“How to use SuperIsland”**：size 34，weight `.semibold`，主文本色，居中。
+- 下方：**“A few quick gestures and you're ready.”**：size 16，次级文本色，居中。
 
-##### Card A — Swipe Left & Right
-- **Visual**: An animated illustration showing a miniature Super Island capsule (dark pill shape, ~180×36) with a **horizontal arrow animation**:
-  - A small chevron or hand icon slides left, then right, in a loop.
-  - Or: render two arrows `chevron.left` and `chevron.right` on either side of the pill, with a subtle pulsing glow animation.
-- **Title**: "Swipe Left & Right"
-- **Description**: "Cycle through modules — music, timer, calendar, and more."
-- Card styling: same dark surface card as permissions cards, but wider. Include the animated mini-island illustration at the top of the card.
+#### 2. 手势说明卡片
 
-##### Card B — Swipe Up & Down
-- **Visual**: A mini island pill with vertical arrows — `chevron.up` above and `chevron.down` below, animated with a gentle bounce.
-- **Title**: "Swipe Up & Down"
-- **Description**: "Swipe up to expand, swipe down to dismiss."
+居中展示 3 张手势卡片：
 
-##### Card C — Lock Button
-- **Visual**: A lock icon `lock.fill` that toggles to `lock.open` in a looping animation (every 2s), inside a rounded square styled like the actual lock button in the app.
-- **Title**: "Lock Open"
-- **Description**: "Tap the lock to keep the island expanded until you dismiss it."
+##### 卡片 A：左右滑动
 
-#### 3. Card Design
-Each gesture card:
-- Width: fill available (max ~340pt each if in a 2+1 grid, or full width ~680pt if stacked vertically).
-- Height: auto, padding 24.
-- Background: `rgba(255,255,255, 0.04)` fill, `rgba(255,255,255, 0.08)` 1px border, cornerRadius 22.
-- The animated illustration area at top: ~100pt tall, centered.
-- Title below illustration: size 17, weight .semibold, text primary.
-- Description below title: size 14, weight .regular, text secondary.
-- Stagger animation on appear (same as permissions cards).
+- 动效：一个迷你 SuperIsland 胶囊，配合左右箭头或手势图标来回移动。
+- 标题：“Swipe Left & Right”。
+- 描述：“Cycle through modules — music, timer, calendar, and more.”。
 
-#### 4. Layout Option
-Prefer a **2-column top row + 1 centered bottom** layout:
-```
+##### 卡片 B：上下滑动
+
+- 动效：迷你岛胶囊，上下箭头轻微 bounce。
+- 标题：“Swipe Up & Down”。
+- 描述：“Swipe up to expand, swipe down to dismiss.”。
+
+##### 卡片 C：锁定按钮
+
+- 动效：`lock.fill` 与 `lock.open` 循环切换。
+- 标题：“Lock Open”。
+- 描述：“Tap the lock to keep the island expanded until you dismiss it.”。
+
+#### 3. 卡片样式
+
+- 宽度：填满可用空间。两列布局时最大约 340pt；垂直堆叠时约 680pt。
+- 高度自适应，padding 24。
+- 背景：`rgba(255,255,255, 0.04)`，边框 `rgba(255,255,255, 0.08)` 1px，cornerRadius 22。
+- 顶部动效区域高约 100pt，居中。
+- 标题：size 17，weight `.semibold`，主文本色。
+- 描述：size 14，weight `.regular`，次级文本色。
+- 使用与权限卡片相同的 stagger 出现动画。
+
+#### 4. 布局选项
+
+优先使用上方两列、下方居中的布局：
+
+```text
 ┌──────────────┐  ┌──────────────┐
 │  Swipe L/R   │  │  Swipe U/D   │
 └──────────────┘  └──────────────┘
@@ -214,70 +229,72 @@ Prefer a **2-column top row + 1 centered bottom** layout:
        └──────────────┘
 ```
 
-Or if space is tight, a vertical `VStack(spacing: 14)` of all 3 is fine.
+如果空间不足，也可以使用垂直 `VStack(spacing: 14)`。
 
-#### 5. "Get Started" Button (bottom)
-- **"Get Started"** button using the **warm accent gradient** (`#F5A84B` → `#E07832`), amber/gold tone.
-- Same pill shape, 46pt tall.
-- On tap: trigger a **sparkle burst animation** (6 small sparkle/star icons that fly outward radially and fade), then dismiss the onboarding window after 0.5s.
-- While launching: button text changes to "Launching…" and becomes disabled.
-- Below: a subtle "Open Settings Later" tertiary text button (no background, just underlined or plain text, text secondary color).
+#### 5. Get Started 按钮
 
----
-
-## Micro-Interactions & Polish
-
-### Hover States
-All interactive elements (buttons, permission cards) should have:
-- Scale effect: 1.0 → 1.03 on hover.
-- Shadow deepens.
-- Transition: `.spring(response: 0.32, dampingFraction: 0.78)`.
-
-### Icon Style — Liquid Glass (from reference images)
-The reference images show a specific icon treatment:
-- Icons sit inside rounded-square containers with **iridescent gradient fills** — blending purple, blue, gold, and amber.
-- The gradients feel like they have a **metallic, refractive quality** — think of light hitting a soap bubble or oil on water.
-- To achieve in SwiftUI: use an `AngularGradient` with stops at purple, blue, gold, orange, back to purple, and rotate the gradient angle slowly (animation over 8s, repeating). Overlay with a subtle `RadialGradient` (white center at 10% → transparent) to create the "liquid glass" light refraction effect.
-- Add a thin 1px border in `rgba(255,255,255, 0.15)` to give a glass-edge feel.
-- Drop shadow: `Color.black.opacity(0.20), radius: 16, y: 8`.
-
-### Window Behavior
-- Window is **not resizable**. Fixed size.
-- `isMovableByWindowBackground = true` — user can drag from anywhere.
-- No minimize button behavior needed.
-- Close button dismissal calls `onClose` callback.
-- The window corners should be clipped to a continuous rounded rectangle so no sharp macOS window corners are visible.
-
-### Accessibility
-- All interactive elements must have `.accessibilityLabel()` and `.accessibilityValue()`.
-- Headers marked with `.accessibilityAddTraits(.isHeader)`.
-- Permission cards use `.accessibilityElement(children: .combine)` with descriptive labels.
-- VoiceOver must be able to navigate all pages linearly.
+- 文案：“Get Started”。
+- 使用暖色强调渐变 `#F5A84B` → `#E07832`。
+- 胶囊形状，高 46pt。
+- 点击时触发 sparkle burst 动画，6 个小星星向外飞出并淡出，0.5 秒后关闭 onboarding。
+- 启动中时按钮文字变成 “Launching…”，并禁用。
+- 下方提供 “Open Settings Later” 三级文本按钮。
 
 ---
 
-## File Structure
+## 微交互与打磨
 
-```
-SuperIsland/Onboarding/
-├── OnboardingView.swift              — Main container, page state, backdrop, palette, shared components
-├── OnboardingWindowController.swift  — NSWindow setup (no title bar, dark, fixed size, rounded)
-├── HelloScreenView.swift             — Page 1: Hello animation + welcome text
-├── PermissionsScreenView.swift       — Page 2: Permission cards with required/optional sections
-├── GetStartedScreenView.swift        — Page 3: Gesture tutorial cards + launch button
-├── PermissionCardComponent.swift     — Reusable permission card with icon, text, action, badge
-```
+### Hover 状态
 
-Replace ALL existing onboarding files with the new implementation. The `OnboardingPermission` enum should be expanded to cover all 7 permissions (Screen Recording, Accessibility, Calendar, Notifications, Microphone, Location, Bluetooth) with required vs. optional distinction. The `OnboardingPermissionState` should track all of them.
+所有交互元素（按钮、权限卡片）都应有：
+
+- Scale：1.0 → 1.03。
+- 阴影增强。
+- 动画：`.spring(response: 0.32, dampingFraction: 0.78)`。
+
+### Liquid Glass 图标风格
+
+参考图中的图标处理方式：
+
+- 图标位于圆角方形容器中，容器使用虹彩渐变填充，混合紫、蓝、金、琥珀色。
+- 渐变应有金属、折射质感，像光照在肥皂泡或油膜上。
+- SwiftUI 实现方式：使用带紫、蓝、金、橙等 stop 的 `AngularGradient`，缓慢旋转角度（8 秒循环）。叠加微弱 `RadialGradient` 作为高光。
+- 添加 `rgba(255,255,255, 0.15)` 1px 边框，形成玻璃边缘感。
+- 阴影：`Color.black.opacity(0.20), radius: 16, y: 8`。
+
+### 窗口行为
+
+- 窗口不可调整大小，固定尺寸。
+- `isMovableByWindowBackground = true`，允许从任意位置拖动。
+- 不需要最小化按钮行为。
+- 关闭按钮触发 `onClose` 回调。
+- 窗口圆角应裁剪为 continuous rounded rectangle，避免露出 macOS 原生直角。
+
+### 无障碍
+
+- 所有交互元素必须设置 `.accessibilityLabel()` 和 `.accessibilityValue()`。
+- 标题使用 `.accessibilityAddTraits(.isHeader)`。
+- 权限卡片使用 `.accessibilityElement(children: .combine)`，提供描述性 label。
+- VoiceOver 必须能够线性导航所有页面。
 
 ---
 
-## Summary of Key Requirements
+## 文件结构建议
 
-1. **Page 1**: Apple "Hello" effect — large text with gradient color wipe reveal animation, welcome copy, feature chips, continue button.
-2. **Page 2**: All 7 permissions in cards with liquid-glass iridescent icons, required/optional split, leaf-shaped granted badge, polling for permission state.
-3. **Page 3**: 3 gesture tutorial cards (swipe L/R, swipe U/D, lock button) with animated mini-illustrations, "Get Started" warm button with sparkle burst.
-4. **Background**: Liquid glass purple animated gradient (blurred orbs drifting slowly) behind a dark overlay — atmospheric, never interfering with readability.
-5. **Window**: Dark, non-native feel. No visible title bar. Rounded corners. Fixed size ~840×620. Movable by background.
-6. **Theme**: Entirely dark/black. Rich blacks, not flat. Subtle depth through layered transparencies.
-7. **Icons**: Liquid glass style — iridescent angular gradients (purple/blue/gold) in rounded-square containers, inspired by the reference images' metallic refractive look.
+- `OnboardingWindowController.swift`：窗口创建、生命周期、关闭回调。
+- `OnboardingView.swift`：页面容器和状态流转。
+- `PermissionsManager.swift`：权限检查和请求。
+- 共享样式可抽到局部 helper / private view 中。
+
+---
+
+## 验收标准
+
+- onboarding 作为独立悬浮卡片出现。
+- 没有可见原生标题栏或工具栏。
+- 背景有微妙动态渐变，但不影响阅读。
+- 页面转场流畅。
+- 权限状态可实时更新。
+- 必需权限未授权时不能继续。
+- 所有按钮和卡片 hover 状态自然。
+- VoiceOver 可用。

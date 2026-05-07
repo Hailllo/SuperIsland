@@ -331,7 +331,7 @@ private struct TeleprompterFullExpandedInner: View {
                     HStack(spacing: 3) {
                         Image(systemName: "pencil")
                             .font(.system(size: 9, weight: .semibold))
-                        Text("Edit")
+                        Text(L("Edit"))
                             .font(.system(size: 11, weight: .medium))
                     }
                     .foregroundColor(.white.opacity(0.38))
@@ -372,7 +372,7 @@ private func addScriptPrompt(size: CGFloat) -> some View {
     Button { TeleprompterScriptEditorWindowController.show() } label: {
         HStack(spacing: 5) {
             Image(systemName: "plus.circle")
-            Text("Add script")
+            Text(L("Add script"))
                 .font(.system(size: size, weight: .medium))
         }
         .font(.system(size: size))

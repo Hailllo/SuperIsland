@@ -31,7 +31,7 @@ struct ModuleSettingsView: View {
                 SettingToggleRow(title: "Weather", isOn: $appState.weatherEnabled)
                 SettingRowDivider()
                 HStack {
-                    Text("Temperature Unit")
+                    Text(L("Temperature Unit"))
                         .font(.system(size: 13))
                     Spacer(minLength: 8)
                     Picker("", selection: $appState.temperatureUnit) {
@@ -52,10 +52,10 @@ struct ModuleSettingsView: View {
                 SettingToggleRow(title: "Teleprompter", isOn: $appState.teleprompterEnabled)
                 SettingRowDivider()
                 HStack {
-                    Text("Script")
+                    Text(L("Script"))
                         .font(.system(size: 13))
                     Spacer(minLength: 8)
-                    Button("Edit Script…") {
+                    Button(L("Edit Script…")) {
                         TeleprompterScriptEditorWindowController.show()
                     }
                     .font(.system(size: 12))

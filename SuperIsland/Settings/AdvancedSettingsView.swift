@@ -14,8 +14,8 @@ struct AdvancedSettingsView: View {
             SettingGroup {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Show island on").font(.system(size: 13))
-                        Text("Pick a specific display or let SuperIsland choose")
+                        Text(L("Show island on")).font(.system(size: 13))
+                        Text(L("Pick a specific display or let SuperIsland choose"))
                             .font(.system(size: 11)).foregroundColor(.secondary)
                     }
                     Spacer(minLength: 8)
@@ -39,21 +39,21 @@ struct AdvancedSettingsView: View {
             SettingGroup {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Reset All Settings").font(.system(size: 13))
-                        Text("Restore all settings to their defaults")
+                        Text(L("Reset All Settings")).font(.system(size: 13))
+                        Text(L("Restore all settings to their defaults"))
                             .font(.system(size: 11)).foregroundColor(.secondary)
                     }
                     Spacer()
-                    Button("Reset") {
+                    Button(L("Reset")) {
                         showResetAlert = true
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .alert("Reset Settings", isPresented: $showResetAlert) {
-                        Button("Cancel", role: .cancel) {}
-                        Button("Reset", role: .destructive) { resetAllSettings() }
+                    .alert(L("Reset Settings"), isPresented: $showResetAlert) {
+                        Button(L("Cancel"), role: .cancel) {}
+                        Button(L("Reset"), role: .destructive) { resetAllSettings() }
                     } message: {
-                        Text("This will reset all SuperIsland settings to their defaults.")
+                        Text(L("This will reset all SuperIsland settings to their defaults."))
                     }
                 }
                 .padding(.horizontal, 16).padding(.vertical, 12)
@@ -62,7 +62,7 @@ struct AdvancedSettingsView: View {
             SettingSectionLabel(title: "About")
             SettingGroup {
                 HStack {
-                    Text("Version").font(.system(size: 13))
+                    Text(L("Version")).font(.system(size: 13))
                     Spacer()
                     Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
                         .font(.system(size: 13, design: .monospaced))
@@ -73,7 +73,7 @@ struct AdvancedSettingsView: View {
                 SettingRowDivider()
 
                 HStack {
-                    Text("Build").font(.system(size: 13))
+                    Text(L("Build")).font(.system(size: 13))
                     Spacer()
                     Text(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")
                         .font(.system(size: 13, design: .monospaced))
@@ -85,7 +85,7 @@ struct AdvancedSettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Updates").font(.system(size: 13))
+                        Text(L("Updates")).font(.system(size: 13))
                         updateStatusText
                     }
                     Spacer()
@@ -103,11 +103,11 @@ struct AdvancedSettingsView: View {
         case .idle:
             EmptyView()
         case .checking:
-            Text("Checking...").font(.system(size: 11)).foregroundColor(.secondary)
+            Text(L("Checking...")).font(.system(size: 11)).foregroundColor(.secondary)
         case .upToDate:
-            Text("You're up to date").font(.system(size: 11)).foregroundColor(.green)
+            Text(L("You're up to date")).font(.system(size: 11)).foregroundColor(.green)
         case .updateAvailable(let version, _, _):
-            Text("Version \(version) available").font(.system(size: 11)).foregroundColor(.orange)
+            Text(L("Version %@ available", version)).font(.system(size: 11)).foregroundColor(.orange)
         case .failed(let message):
             Text(message).font(.system(size: 11)).foregroundColor(.red)
         }
@@ -119,7 +119,7 @@ struct AdvancedSettingsView: View {
         case .checking:
             ProgressView().controlSize(.small)
         case .updateAvailable(let version, let releaseURL, let downloadURL):
-            Button("Update") {
+            Button(L("Update")) {
                 if let downloadURL {
                     AutoUpdater.shared.start(downloadURL: downloadURL, releaseURL: releaseURL)
                 } else {
@@ -129,7 +129,7 @@ struct AdvancedSettingsView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.small)
         default:
-            Button("Check for Updates") { updateChecker.checkNow() }
+            Button(L("Check for Updates")) { updateChecker.checkNow() }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
         }

@@ -275,11 +275,11 @@ private enum MascotLoadError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "Couldn't build the mascot download URL."
+            return L("Couldn't build the mascot download URL.")
         case .invalidTemplate:
-            return "The mascot template response couldn't be read."
+            return L("The mascot template response couldn't be read.")
         case .httpStatus(let statusCode):
-            return "The mascot service returned HTTP \(statusCode)."
+            return L("The mascot service returned HTTP %d.", statusCode)
         }
     }
 }

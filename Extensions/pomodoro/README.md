@@ -1,15 +1,15 @@
-# Pomodoro Timer Extension
+# 番茄钟扩展
 
-Standalone SuperIsland extension implemented only with the `SuperIsland` + `View` JavaScript API.
+这是一个独立的 SuperIsland 扩展，仅使用 `SuperIsland` 和 `View` JavaScript API 实现。
 
-## Files
+## 文件
 
-- `manifest.json` - extension metadata and permissions
-- `index.js` - extension logic and UI (compact, minimal, expanded, full)
-- `settings.json` - declarative settings schema rendered by the host app
+- `manifest.json`：扩展元数据和权限声明
+- `index.js`：扩展逻辑和 UI，包括紧凑、极简、展开和全展开视图
+- `settings.json`：声明式设置 schema，由宿主应用渲染为原生设置界面
 
-## Notes
+## 说明
 
-- No imports from this app codebase.
-- Can be copied to any SuperIsland-compatible extension host.
-- Designed to be packaged/distributed independently later (zip/Git release/registry).
+- 不依赖主应用代码库中的 Swift 实现。
+- 可以复制到任何兼容 SuperIsland 的扩展宿主中运行。
+- 设计上支持后续独立打包和分发，例如 zip、Git release 或 registry。

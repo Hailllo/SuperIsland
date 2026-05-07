@@ -15,7 +15,7 @@ struct FocusCompactView: View {
                     .foregroundColor(.white)
                     .lineLimit(1)
             } else {
-                Text("Focus Off")
+                Text(L("Focus Off"))
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.5))
             }
